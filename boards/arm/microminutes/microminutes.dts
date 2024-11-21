@@ -1,0 +1,132 @@
+// Copyright (c) 2024 Nordic Semiconductor ASA
+// SPDX-License-Identifier: Apache-2.0
+
+/dts-v1/;
+#include <nordic/nrf52810_qfaa.dtsi>
+
+/ {
+	model = "Microminutes";
+	compatible = "jacob-lundstrom,microminutes";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+	};
+
+	aliases {
+		led1 = &segment1high;
+		led2 = &segment2high;
+		led3 = &segment3high;
+		led4 = &segment4high;
+		int1 = &int1;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		segment1high: segment_1_high {
+			gpios = <&gpio0 20 0>;
+			label = "Segment_1_High";
+		};
+
+		segment2high: segment_2_high {
+			gpios = <&gpio0 16 (1 << 9)>;
+			label = "Segment_2_High";
+		};
+
+		segment3high: segment_3_high {
+			gpios = <&gpio0 15 (1 << 9)>;
+			label = "Segment_3_High";
+		};
+
+		segment4high: segment_4_high {
+			gpios = <&gpio0 12 (1 << 9)>;
+			label = "Segment_4_High";
+		};
+
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+		int1: int1 {
+			gpios = <&gpio0 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "Int1";
+		};
+	};
+
+	
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x0 0xc000>;
+		};
+		slot0_partition: partition@c000 {
+			label = "image-0";
+			reg = <0xc000 0xa000>;
+		};
+		slot1_partition: partition@16000 {
+			label = "image-1";
+			reg = <0x16000 0xa000>;
+		};
+		scratch_partition: partition@20000 {
+			label = "image-scratch";
+			reg = <0x20000 0xa000>;
+		};
+		storage_partition: partition@2a000 {
+			label = "storage";
+			reg = <0x2a000 0x6000>;
+		};
+	};
+};
+
+
+&gpio0 {
+	status = "okay";
+	gpiote-instance = <&gpiote>;
+};
+
+&gpiote {
+	status = "okay";
+};
+
+&i2c0 {
+	compatible = "nordic,nrf-twim";
+	status = "okay";
+
+	pinctrl-0 = <&i2c0_default>;
+	pinctrl-names = "default";
+	clock-frequency = <250000>;
+
+	fxl6408umx: fxl6408umx@44{
+		compatible="i2c-device";
+		label="FXL16408umx";
+		reg = <0x44>;
+	};
+
+	lis2dw12tr: lis2dw12tr@19{
+		compatible="i2c-device";
+		label="LIS2DW12TR";
+		reg = <0x19>;
+		// int-gpios = <&gpio0 4 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+	};
+};
+
+
+
+&pinctrl {
+	i2c0_default: i2c0_default {
+		group1 {
+			psels = <NRF_PSEL(TWIM_SCL, 0, 5)>, <NRF_PSEL(TWIM_SDA, 0, 8)>;
+		};
+	};
+};
+
+

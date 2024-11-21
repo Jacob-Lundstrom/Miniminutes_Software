@@ -1,0 +1,13 @@
+# Copyright (c) 2024 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+
+identifier: ouroboros_v0_1_nrf52810
+name: Ouroboros V0_1 nRF52810
+type: mcu
+arch: arm
+ram: 24
+flash: 192
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
