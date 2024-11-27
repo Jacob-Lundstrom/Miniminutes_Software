@@ -19,7 +19,7 @@ static const struct i2c_dt_spec display_i2c = I2C_DT_SPEC_GET(I2C0_DISPLAY_NODE)
 
 uint8_t writeToDisplay(uint8_t reg, uint8_t val);
 uint8_t readFromDisplay(uint8_t reg);
-int configureDisplay();
+int Display_init();
 void enableSegment(int segment);
 void disableSegments();
 void displayNone();

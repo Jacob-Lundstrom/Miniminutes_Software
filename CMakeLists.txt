@@ -5,3 +5,5 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(blinky_1)
 
 target_sources(app PRIVATE src/main.c src/display.c src/imu.c src/bluetooth.c)
+
+# target_sources(app PRIVATE src/main.c src/display.c src/imu.c)

@@ -3,7 +3,11 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 
+#include "main.h"
 #include "imu.h"
+
+static struct gpio_callback pin_cb_data;
+
 
 uint8_t writeToIMU(uint8_t reg, uint8_t val) {
 
@@ -46,4 +50,21 @@ void enableInt1() {
 	writeToIMU(0x34, 0x80);
 	writeToIMU(0x23, 0x08);
 	writeToIMU(0x3F, 0x20);
+}
+
+void IMU_init(void) {
+	enableInt1();
+
+	int ret;
+
+	if (!gpio_is_ready_dt(&INT1)) {
+		return 0;
+	}
+	
+	ret = gpio_pin_interrupt_configure_dt(&INT1,GPIO_INT_EDGE_TO_ACTIVE);
+	if (ret < 0) {
+		return 0;
+	}
+	gpio_init_callback(&pin_cb_data, IMU_wakeup_isr, BIT(INT1.pin));
+	gpio_add_callback(INT1.port, &pin_cb_data);
 }

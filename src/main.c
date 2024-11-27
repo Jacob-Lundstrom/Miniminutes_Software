@@ -11,8 +11,6 @@
 #include <zephyr/drivers/i2c.h>
 #include <nrfx_timer.h>
 
-
-
 #include <nrfx_clock.h>
 #include <nrfx_rtc.h>
 
@@ -20,26 +18,25 @@
 #include <zephyr/drivers/counter.h>
 #include <zephyr/sys/printk.h>
 
+#include "main.h"
 #include "display.h"
 #include "imu.h"
 #include "bluetooth.h"
+
 
 #define DELAY 60000000
 #define ALARM_CHANNEL_ID 0
 #define TIMER DT_NODELABEL(rtc0)
 struct counter_alarm_cfg alarm_cfg;
 const struct device *const counter_dev = DEVICE_DT_GET(TIMER);
-#define COMPARE_COUNTERTIME 3
-
-static struct gpio_callback pin_cb_data;
 
 static struct k_timer display_timeout;
 
 const k_tid_t thread_main_id;
-#define STACKSIZE 1024
+#define MAIN_STACKSIZE 512
 #define PRIORITY 7
 
-int n = 0;
+static uint32_t current_time_seconds = 0;
 bool show_time = false;
 
 void display_timeout_isr(struct k_timer *dummy) {
@@ -69,10 +66,10 @@ static void test_counter_interrupt_fn(const struct device *counter_dev,
 	now_usec = counter_ticks_to_us(counter_dev, now_ticks);
 	now_sec = (int)(now_usec / USEC_PER_SEC);
 
-	n += 60;
+	current_time_seconds = now_sec;
 	
-	int hr = n / (60*60) ;
-	int min = n / (60) - 60 * hr;
+	int hr = current_time_seconds / (60*60) ;
+	int min = current_time_seconds / (60) - 60 * hr;
 
 	if (min % 15 == 0) { // Displays the time automatically every 15 minutes
 		show_time = true;
@@ -93,7 +90,6 @@ int getTime(){
 	uint64_t now_usec;
 	int now_sec;
 
-	
 	int err = counter_get_value(counter_dev, &now_ticks);
 	
 	if (!counter_is_counting_up(counter_dev)) {
@@ -129,16 +125,14 @@ void setup_rtc(){
 
     /* Initialize and start the LFRC clock */
     nrfx_clock_init(NULL);
-    nrfx_clock_lfclk_start();
+    // nrfx_clock_lfclk_start();
 
-    /* Allow time for the LFRC to stabilize */
-    // k_sleep(K_SECONDS(1));
+	while (NRF_CLOCK->EVENTS_DONE == 0);
 
 	return;
 }
 
-
-void pin_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
+void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	show_time = true;
 	k_timer_init(&display_timeout, display_timeout_isr, NULL );
@@ -146,65 +140,44 @@ void pin_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 	k_thread_resume(thread_main_id);
 }
 
-int configure_gpios() {
-	
-	int ret;
-
-	if (!gpio_is_ready_dt(&INT1)) {
-		return 0;
-	}
-	
-	ret = gpio_pin_interrupt_configure_dt(&INT1,GPIO_INT_EDGE_TO_ACTIVE);
-	if (ret < 0) {
-		return 0;
-	}
-	gpio_init_callback(&pin_cb_data, pin_isr, BIT(INT1.pin));
-	gpio_add_callback(INT1.port, &pin_cb_data);
-}
-
 void configure_timers(){	
 	k_timer_init(&display_timeout, display_timeout_isr, NULL );
 	k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
 }
 
+void SYSTEM_init(void){
+
+	Display_init();
+	IMU_init();
+
+	configure_timers();
+	// setup_rtc();
+}
+
 int thread_main(void) {
 
-	configureDisplay();
-	configure_gpios();
-	enableInt1();
-	configure_timers();
-
-
-	// int err = BLE_init();
-	// if (err) {
-	// 	n = 1000;
-	// }
-
-	setup_rtc();
+	SYSTEM_init();
 
 	int start_time = (0 * 60 + 3) * 60;
 
-	n = start_time;
-
-	while (NRF_CLOCK->EVENTS_DONE == 0);
-
+	current_time_seconds = start_time;
 
 	show_time = true;
 	while (1) {
 		if (show_time) {
-			n = start_time + getTime();
+			current_time_seconds = start_time + getTime();
 
-			if (n >= 24 * 60 * 60) {
+			if (current_time_seconds >= 24 * 60 * 60) {
 				// 1 full day has passed, reset the counter
-				n -= 24 * 60 * 60;
-				NRF_RTC0->TASKS_CLEAR = 1;
+				current_time_seconds -= 24 * 60 * 60;
+				// NRF_RTC0->TASKS_CLEAR = 1;
 				start_time = 0;
 			}
 
 			// n = n*60; // Uncomment this line to show min:sec instead of hr:min
 
-			int hr = n / (60*60) ;
-			int min = n / (60) - 60 * hr;
+			int hr = current_time_seconds / (60*60) ;
+			int min = current_time_seconds / (60) - 60 * hr;
 			
 			int dig1 = hr/10;
 			int dig2 = hr - dig1 * 10;
@@ -220,11 +193,8 @@ int thread_main(void) {
 	return 0;
 }
 
-K_THREAD_DEFINE(thread_main_id, STACKSIZE, thread_main, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-
-const k_tid_t ble_thread_id;
-
-// K_THREAD_DEFINE(BLE_Thread_id, STACKSIZE, BLE_init, NULL, NULL, NULL,
-// 		PRIORITY, 0, 0);
+K_THREAD_DEFINE(ble_thread_id, BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+		PRIORITY, 0, 0);

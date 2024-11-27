@@ -7,6 +7,13 @@
 			"name": "Launch build",
 			"config": "c:/ouroboros-dev/Board_Programs/blinky_1/build",
 			"runToEntryPoint": "main"
+		},
+		{
+			"type": "nrf-connect",
+			"request": "launch",
+			"name": "Launch blinky_1\\build_2",
+			"config": "${workspaceFolder}/build_2",
+			"runToEntryPoint": "main"
 		}
 	]
 }

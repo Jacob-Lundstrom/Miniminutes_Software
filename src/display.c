@@ -34,7 +34,7 @@ uint8_t readFromDisplay(uint8_t reg) {
 	return data;
 }
 
-int configureDisplay() {
+int Display_init() {
 
 	int ret = 0;
   	if (!gpio_is_ready_dt(&S1)) {
@@ -74,9 +74,18 @@ int configureDisplay() {
 	}
 
 	
-	writeToDisplay(0x03, 0xFF);  // All outputs
-	writeToDisplay(0x05, 0xFF);  // All outputs in high state
-	writeToDisplay(0x07, 0x00);  // Turn off all tristates (Enable output control)
+	ret = writeToDisplay(0x03, 0xFF);  // All outputs
+	if (ret != 0) {
+		return 0;
+	}
+	ret = writeToDisplay(0x05, 0xFF);  // All outputs in high state
+	if (ret != 0) {
+		return 0;
+	}
+	ret = writeToDisplay(0x07, 0x00);  // Turn off all tristates (Enable output control)
+	if (ret != 0) {
+		return 0;
+	}
 }
 
 void enableSegment(int segment) {
