@@ -280,7 +280,7 @@
    compatible = "nordic,nrf-saadc";
    reg = <0x40007000 0x1000>;
    interrupts = <7 1>;
-   status = "disabled";
+   status = "okay";
    #io-channel-cells = <1>;
   };
   timer0: timer@40008000 {
@@ -552,7 +552,23 @@
   };
  };
 
+ zephyr,user {
+  io-channels = <&adc 0>;
+ };
+};
 
+&adc {
+ #address-cells = <1>;
+ #size-cells = <0>;
+ status = "okay";
+ channel@0 {
+  reg = <0>;
+  zephyr,gain = "ADC_GAIN_1_6";
+  zephyr,reference = "ADC_REF_INTERNAL";
+  zephyr,acquisition-time = <0>;
+  zephyr,input-positive = <2>;
+  zephyr,resolution = <12>;
+ };
 };
 
 &flash0 {
@@ -625,7 +641,7 @@
  clock-frequency = < 0x8000 >;
  prescaler = <0x0FFF>;
 };
-# 143 "C:/ouroboros-dev/boards/arm/microminutes/microminutes.dts"
+# 159 "C:/ouroboros-dev/boards/arm/microminutes/microminutes.dts"
 &pinctrl {
  i2c0_default: i2c0_default {
   group1 {
@@ -640,6 +656,12 @@
 
 &radio {
  ble-2mbps-supported;
+};
+
+
+
+&timer0 {
+ status = "okay";
 };
 # 0 "<command-line>" 2
 # 1 "C:/ncs/v2.6.1/zephyr/misc/empty_file.c"

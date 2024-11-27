@@ -180,6 +180,9 @@ C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/usb/common/nrf_u
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/usb/common/nrf_usbd_common/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/usb_c/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/usb_c/CMakeFiles/rebuild_cache.dir
+C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/adc/CMakeFiles/drivers__adc.dir
+C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/adc/CMakeFiles/edit_cache.dir
+C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/adc/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/clock_control/CMakeFiles/drivers__clock_control.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/clock_control/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/clock_control/CMakeFiles/rebuild_cache.dir

@@ -9,6 +9,7 @@
         "net_context"
     ],
     "__subsystem": [
+        "adc_driver_api",
         "counter_driver_api",
         "entropy_driver_api",
         "flash_driver_api",
@@ -16,7 +17,6 @@
         "i2c_driver_api",
         "rtc_driver_api",
         "crypto_driver_api",
-        "adc_driver_api",
         "auxdisplay_driver_api",
         "bbram_driver_api",
         "can_driver_api",
