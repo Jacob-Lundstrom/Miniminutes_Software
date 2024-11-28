@@ -1,0 +1,34 @@
+This is a list of all possible commands.
+Comands should be sent using the nRF Connect App.
+
+Setting Time
+ST=HH:MM:SS
+ST=HH:MM
+[HH = Set Hour]
+[MM = Set Minute]
+[SS = Set Second]
+
+Set Military Time
+MT=B
+[B = Binary 1/0, 1 -> enabled, 0 -> disabled]
+
+Display Battery Percentage
+GBP
+
+Display Battery Voltage
+GBV
+
+Show Time while Charging
+STC=B
+[B = Binary 1/0, 1 -> enabled, 0 -> disabled]
+{UNIMPLEMENTED}
+
+Show Battery Percentage while Charging
+SPC=B
+[B = Binary 1/0, 1 -> enabled, 0 -> disabled]
+{UNIMPLEMENTED}
+
+Note: Setting either of the two previous values to true will disable the other.
+
+Show Credits
+CR
