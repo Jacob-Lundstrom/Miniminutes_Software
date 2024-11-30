@@ -1,0 +1,4 @@
+osource "c:/ouroboros-dev/boards/shields/*/Kconfig.defconfig"
+osource "c:/ouroboros-dev/board_programs/blinky_1/boards/shields/*/Kconfig.defconfig"
+osource "c:/ncs/v2.6.1/zephyr/samples/bluetooth/beacon/boards/shields/*/Kconfig.defconfig"
+osource "C:/ncs/v2.6.1/nrf/boards/shields/*/Kconfig.defconfig"

@@ -186,9 +186,6 @@ C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/adc/CMakeFiles/r
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/clock_control/CMakeFiles/drivers__clock_control.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/clock_control/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/clock_control/CMakeFiles/rebuild_cache.dir
-C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/counter/CMakeFiles/drivers__counter.dir
-C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/counter/CMakeFiles/edit_cache.dir
-C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/counter/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/entropy/CMakeFiles/drivers__entropy.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/entropy/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/entropy/CMakeFiles/rebuild_cache.dir
@@ -204,9 +201,6 @@ C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/i2c/CMakeFiles/r
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/pinctrl/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/pinctrl/CMakeFiles/drivers__pinctrl.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/pinctrl/CMakeFiles/rebuild_cache.dir
-C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/rtc/CMakeFiles/rebuild_cache.dir
-C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/rtc/CMakeFiles/drivers__rtc.dir
-C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/rtc/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/timer/CMakeFiles/drivers__timer.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/timer/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/timer/CMakeFiles/rebuild_cache.dir

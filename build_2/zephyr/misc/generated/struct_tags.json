@@ -1,21 +1,19 @@
 {
     "__net_socket": [
+        "net_context",
+        "modem_socket",
         "dispatcher_context",
         "spair",
         "net_mgmt_socket",
         "tls_context",
-        "websocket_context",
-        "modem_socket",
-        "net_context"
+        "websocket_context"
     ],
     "__subsystem": [
         "adc_driver_api",
-        "counter_driver_api",
         "entropy_driver_api",
         "flash_driver_api",
         "gpio_driver_api",
         "i2c_driver_api",
-        "rtc_driver_api",
         "crypto_driver_api",
         "auxdisplay_driver_api",
         "bbram_driver_api",
@@ -23,6 +21,7 @@
         "cellular_driver_api",
         "charger_driver_api",
         "coredump_driver_api",
+        "counter_driver_api",
         "dac_driver_api",
         "dai_driver_api",
         "dma_driver_api",
@@ -52,6 +51,7 @@
         "regulator_driver_api",
         "reset_driver_api",
         "retained_mem_driver_api",
+        "rtc_driver_api",
         "sdhc_driver_api",
         "sensor_driver_api",
         "smbus_driver_api",

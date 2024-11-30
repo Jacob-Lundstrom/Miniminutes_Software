@@ -5907,9 +5907,9 @@
 #define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0, __VA_ARGS__)
 #define DT_N_S_soc_S_watchdog_40010000_P_compatible_LEN 1
 #define DT_N_S_soc_S_watchdog_40010000_P_compatible_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_P_wakeup_source 0
+#define DT_N_S_soc_S_watchdog_40010000_P_wakeup_source 1
 #define DT_N_S_soc_S_watchdog_40010000_P_wakeup_source_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_P_zephyr_pm_device_runtime_auto 0
+#define DT_N_S_soc_S_watchdog_40010000_P_zephyr_pm_device_runtime_auto 1
 #define DT_N_S_soc_S_watchdog_40010000_P_zephyr_pm_device_runtime_auto_EXISTS 1
 
 /*

@@ -79,11 +79,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/counter/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/entropy/cmake_install.cmake")
 endif()
 
@@ -105,11 +100,6 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/pinctrl/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/ouroboros-dev/Board_Programs/blinky_1/build_2/zephyr/drivers/rtc/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)

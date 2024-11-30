@@ -124,13 +124,6 @@ int getTime(){
 
 void setup_rtc(){
 	struct device *const counter_dev = DEVICE_DT_GET(TIMER);
-	// while (!device_is_ready(counter_dev));
-	// counter_start(counter_dev);
-	
-	// alarm_cfg.flags = 0;
-	// alarm_cfg.ticks = counter_us_to_ticks(counter_dev, DELAY);
-	// alarm_cfg.callback = test_counter_interrupt_fn;
-	// alarm_cfg.user_data = &alarm_cfg;
 
 	int err = counter_set_channel_alarm(counter_dev, ALARM_CHANNEL_ID,
 					&alarm_cfg);
@@ -139,11 +132,6 @@ void setup_rtc(){
 		return;
 	}
 
-    // Initialize and start the LFRC clock 
-    // nrfx_clock_init(NULL);
-    // nrfx_clock_lfclk_start();
-
-	// while (NRF_CLOCK->EVENTS_DONE == 0);
 	return;
 } 
 
@@ -240,6 +228,7 @@ void continue_showing_time(void){
 	show_time = true;
 	show_percent = false;
 	show_voltage = false;
+	// resume_main_thread();
 }
 
 void continue_showing_battery_percent(void){
@@ -249,6 +238,7 @@ void continue_showing_battery_percent(void){
 	
 	battery_mv = read_battery_voltage();
 	battery_p = 100 * (battery_mv - 3600) / (4200 - 3600);
+	// resume_main_thread();
 }
 
 void continue_showing_battery_voltage(void){
@@ -258,6 +248,7 @@ void continue_showing_battery_voltage(void){
 	
 	battery_mv = read_battery_voltage();
 	battery_p = 100 * (battery_mv - 3600) / (4200 - 3600);
+	// resume_main_thread();
 }
 
 void set_time(uint32_t time) {
@@ -276,3 +267,7 @@ K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main, NULL, NULL, NULL,
 
 K_THREAD_DEFINE(ble_thread_id, BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
+
+int main(void) {
+	
+}

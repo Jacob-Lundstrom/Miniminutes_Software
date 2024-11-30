@@ -341,19 +341,19 @@ void process_input(struct uart_data_t *input) {
 		if ((hr1 > '2') || (hr1 < '0')) return;
 
 		int hr2 = (input->data[4]);
-		if ((hr2 > '6') || (hr2 < '0')) return;
+		if ((hr2 > '9') || (hr2 < '0')) return;
 
 		int min1 = (input->data[6]);
 		if ((min1 > '6') || (min1 < '0')) return;
 
 		int min2 = (input->data[7]);
-		if ((min2 > '6') || (min2 < '0')) return;
+		if ((min2 > '9') || (min2 < '0')) return;
 
 		int sec1 = (input->data[9]);
 		if ((sec1 > '6') || (sec1 < '0')) return;
 
 		int sec2 = (input->data[10]);
-		if ((sec2 > '6') || (sec2 < '0')) return;
+		if ((sec2 > '9') || (sec2 < '0')) return;
 
 		hr1 -= 48;
 		hr2 -= 48;
@@ -369,7 +369,7 @@ void process_input(struct uart_data_t *input) {
 
 		// Set time
 		set_time((hr) * (60 * 60) + (min) * (60) + sec);
-
+		return;
 	} else if ((input->data[0] == 'S') && (input->data[1] == 'T') && (input->data[2] == '=') 
 			&& (input->data[5] == ':')){
 		// ST=HH:MM
@@ -380,13 +380,13 @@ void process_input(struct uart_data_t *input) {
 		if ((hr1 > '2') || (hr1 < '0')) return;
 
 		int hr2 = (input->data[4]);
-		if ((hr2 > '6') || (hr2 < '0')) return;
+		if ((hr2 > '9') || (hr2 < '0')) return;
 
 		int min1 = (input->data[6]);
 		if ((min1 > '6') || (min1 < '0')) return;
 
 		int min2 = (input->data[7]);
-		if ((min2 > '6') || (min2 < '0')) return;
+		if ((min2 > '9') || (min2 < '0')) return;
 
 		hr1 -= 48;
 		hr2 -= 48;
@@ -398,6 +398,7 @@ void process_input(struct uart_data_t *input) {
 
 		// Set time
 		set_time((hr) * (60 * 60) + (min) * (60));
+		return;
 	} else if ((input->data[0] == 'M') && (input->data[1] == 'T') && (input->data[2] == '=')) {
 		// (MT=B)
 		// Request to set Military time (24 HR TIME) Setting
@@ -408,14 +409,17 @@ void process_input(struct uart_data_t *input) {
 			// Military time = true;
 			set_military_time(true);
 		}
+		return;
 	} else if ((input->data[0] == 'G') && (input->data[1] == 'B') && (input->data[2] == 'P')) {
 		// Request to Get Battery Percentage (GBP)
 		// For now, display percentage on the ring
 		continue_showing_battery_percent();
+		return;
 	} else if ((input->data[0] == 'G') && (input->data[1] == 'B') && (input->data[2] == 'V')) {
 		// Request to Get Battery Voltage (GBV)
 		// For now, display voltage on the ring, using colon as period
 		continue_showing_battery_voltage();
+		return;
 	}
 }
 
