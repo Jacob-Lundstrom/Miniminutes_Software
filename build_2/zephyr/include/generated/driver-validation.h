@@ -6,8 +6,6 @@
                 
 #define K_SYSCALL_DRIVER_ADC(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, adc, ADC)
 
-#define K_SYSCALL_DRIVER_COUNTER(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, counter, COUNTER)
-
 #define K_SYSCALL_DRIVER_ENTROPY(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, entropy, ENTROPY)
 
 #define K_SYSCALL_DRIVER_FLASH(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, flash, FLASH)
@@ -16,7 +14,7 @@
 
 #define K_SYSCALL_DRIVER_I2C(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, i2c, I2C)
 
-#define K_SYSCALL_DRIVER_RTC(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, rtc, RTC)
+#define K_SYSCALL_DRIVER_WDT(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, wdt, WDT)
 
 #define K_SYSCALL_DRIVER_CRYPTO(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, crypto, CRYPTO)
 
@@ -31,6 +29,8 @@
 #define K_SYSCALL_DRIVER_CHARGER(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, charger, CHARGER)
 
 #define K_SYSCALL_DRIVER_COREDUMP(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, coredump, COREDUMP)
+
+#define K_SYSCALL_DRIVER_COUNTER(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, counter, COUNTER)
 
 #define K_SYSCALL_DRIVER_DAC(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, dac, DAC)
 
@@ -90,6 +90,8 @@
 
 #define K_SYSCALL_DRIVER_RETAINED_MEM(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, retained_mem, RETAINED_MEM)
 
+#define K_SYSCALL_DRIVER_RTC(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, rtc, RTC)
+
 #define K_SYSCALL_DRIVER_SDHC(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, sdhc, SDHC)
 
 #define K_SYSCALL_DRIVER_SENSOR(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, sensor, SENSOR)
@@ -103,8 +105,6 @@
 #define K_SYSCALL_DRIVER_UART(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, uart, UART)
 
 #define K_SYSCALL_DRIVER_W1(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, w1, W1)
-
-#define K_SYSCALL_DRIVER_WDT(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, wdt, WDT)
 
 #define K_SYSCALL_DRIVER_CAN_TRANSCEIVER(ptr, op) K_SYSCALL_DRIVER_GEN(ptr, op, can_transceiver, CAN_TRANSCEIVER)
 

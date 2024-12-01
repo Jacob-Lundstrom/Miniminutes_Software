@@ -19,10 +19,9 @@ static bool show_voltage;
 
 static int battery_mv;
 static int battery_p;
+static int reset_ble_required;
 
-void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
-
-void display_timeout_isr(struct k_timer *dummy);
+int thread_main(void);
 
 void resume_main_thread(void);
 void continue_showing_time(void);
@@ -30,5 +29,14 @@ void continue_showing_battery_percent(void);
 void continue_showing_battery_voltage(void);
 
 void set_time(uint32_t time);
-
 void set_military_time(bool status);
+
+void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
+void display_timeout_isr(struct k_timer *dummy);
+
+
+void simulate_IMU_interrupt(void);
+
+void reset_BLE(void);
+
+void start_BLE_thread(void);

@@ -221,12 +221,11 @@
 			status = "okay";
 		};
 		wdt: wdt0: watchdog@40010000 {
-			compatible = "nordic,nrf-wdt";
+			compatible = "nordic,nrf-watchdog";
 			reg = < 0x40010000 0x1000 >;
 			interrupts = < 0x10 0x1 >;
 			status = "okay";
 			wakeup-source;
-			zephyr,pm-device-runtime-auto;
 		};
 		rtc1: rtc@40011000 {
 			compatible = "nordic,nrf-rtc";

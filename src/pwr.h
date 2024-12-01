@@ -23,6 +23,11 @@ static const struct adc_dt_spec adc_channels[] = {
 			     DT_SPEC_AND_COMMA)
 };
 
+#define BATTERY_ADC_SCALE_FACTOR (3.0/2.0)
+#define BATTERY_MIN_VOLTAGE_MV 3600
+#define BATTERY_MAX_VOLTAGE_MV 4200
+
 int ADC_init(void);
 
 uint32_t read_battery_voltage(void);
+uint8_t get_battery_percentage(uint32_t battery_mv);

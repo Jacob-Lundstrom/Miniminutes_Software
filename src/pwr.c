@@ -1,8 +1,6 @@
 #include "pwr.h"
 
 
-#define BATTERY_ADC_SCALE_FACTOR (3.0/2.0)
-
 int err;
 uint32_t count = 0;
 uint16_t buf;
@@ -12,8 +10,7 @@ struct adc_sequence sequence = {
 	.buffer_size = sizeof(buf),
 };
 
-int ADC_init(void)
-{
+int ADC_init(void) {
 	/* Configure channels individually prior to sampling. */
 	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++) {
 		if (!adc_is_ready_dt(&adc_channels[i])) {
@@ -29,7 +26,7 @@ int ADC_init(void)
 	}
 }
 
-uint32_t read_battery_voltage(){
+uint32_t read_battery_voltage(void) {
 	uint32_t avg = 0;
 	int rdgs = 100;
 	// printk("ADC reading[%u]:\n", count++);
@@ -71,4 +68,9 @@ uint32_t read_battery_voltage(){
 	}
 	}
 	return (avg / rdgs) * BATTERY_ADC_SCALE_FACTOR;
+}
+
+uint8_t get_battery_percentage(uint32_t battery_mv){
+	return 100 * (battery_mv - BATTERY_MIN_VOLTAGE_MV) / 
+	(BATTERY_MAX_VOLTAGE_MV - BATTERY_MIN_VOLTAGE_MV);
 }

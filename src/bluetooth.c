@@ -29,6 +29,7 @@
 
 #include "main.h"
 #include "bluetooth.h"
+#include "watchdog.h"
 
 
 #define BT_LE_ADV_CONN_CUSTOM  BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, 0x0b40, 0x0b40, NULL)
@@ -46,6 +47,8 @@ static K_SEM_DEFINE(ble_init_ok, 0, 1);
 static struct bt_conn *current_conn;
 static struct bt_conn *auth_conn;
 
+
+bool BLE_RECIEVED_FLAG;
 
 struct uart_data_t {
 	void *fifo_reserved;
@@ -107,8 +110,6 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data, uint1
 static struct bt_nus_cb nus_cb = {
 	.received = bt_receive_cb,
 };
-
-void error(void);
 
 #ifdef CONFIG_BT_NUS_SECURITY_ENABLED
 static void num_comp_reply(bool accept);
@@ -218,15 +219,18 @@ static struct bt_conn_auth_info_cb conn_auth_info_callbacks;
 static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			  uint16_t len)
 {
-	int err;
-	char addr[BT_ADDR_LE_STR_LEN] = {0};
-
+	// These lines are important for some reason, I don't know why.
+	// Removing them makes the device stop working
+	char addr[BT_ADDR_LE_STR_LEN] = {0}; 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
 	
-	// struct uart_data_t *buf;
+	if (BLE_RECIEVED_FLAG) return; // Make sure we're not in the middle of displaying something.
+	// If we are, ignore this packet and wait.
+
+	struct uart_data_t *ble_tx_buf = k_malloc(sizeof(*ble_tx_buf));
 
 	for (uint16_t pos = 0; pos != len;) {
-		struct uart_data_t *ble_tx_buf = k_malloc(sizeof(*ble_tx_buf));
+		// static struct uart_data_t *ble_tx_buf;
 
 		if (!ble_tx_buf) {
 			return;
@@ -255,18 +259,12 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 
 		k_fifo_put(&tx, ble_tx_buf);
 	}	
+	k_free(ble_tx_buf);
 	
 	// k_fifo_put(&tx, buf);
 	DATA_REQUESTED = true;
 }
 
-void error(void)
-{
-	while (true) {
-		/* Spin for ever */
-		k_sleep(K_MSEC(1000));
-	}
-}
 
 #ifdef CONFIG_BT_NUS_SECURITY_ENABLED
 static void num_comp_reply(bool accept)
@@ -285,6 +283,7 @@ static void num_comp_reply(bool accept)
 int BLE_init(void)
 {
 	int err = 0;
+	BLE_RECIEVED_FLAG = false;
 
 	if (IS_ENABLED(CONFIG_BT_NUS_SECURITY_ENABLED)) {
 		err = bt_conn_auth_cb_register(&conn_auth_callbacks);
@@ -300,7 +299,7 @@ int BLE_init(void)
 
 	err = bt_enable(NULL);
 	if (err) {
-		error();
+		return 0;
 	}
 
 	k_sem_give(&ble_init_ok);
@@ -314,20 +313,20 @@ int BLE_init(void)
 		return 0;
 	}
 
+	// Advertises every 1.8 S
 	err = bt_le_adv_start(BT_LE_ADV_CONN_CUSTOM, ad, ARRAY_SIZE(ad), sd,
 			      ARRAY_SIZE(sd));
+	
+	// Advertises every 0.1 s
+	// err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
+	// 		      ARRAY_SIZE(sd));
 	if (err) {
 		return 0;
 	}
 
+	// watchdog_init();
 	ble_write_thread();
 }
-
-void BLE_stop(void){
-	bt_disable();
-	bt_le_adv_stop();
-}
-
 
 void process_input(struct uart_data_t *input) {
 
@@ -338,37 +337,30 @@ void process_input(struct uart_data_t *input) {
 
 		// Check input conditions
 		int hr1 = (input->data[3]);
-		if ((hr1 > '2') || (hr1 < '0')) return;
-
 		int hr2 = (input->data[4]);
-		if ((hr2 > '9') || (hr2 < '0')) return;
-
 		int min1 = (input->data[6]);
-		if ((min1 > '6') || (min1 < '0')) return;
-
 		int min2 = (input->data[7]);
-		if ((min2 > '9') || (min2 < '0')) return;
-
 		int sec1 = (input->data[9]);
-		if ((sec1 > '6') || (sec1 < '0')) return;
-
 		int sec2 = (input->data[10]);
-		if ((sec2 > '9') || (sec2 < '0')) return;
 
 		hr1 -= 48;
 		hr2 -= 48;
 		int hr = hr1 * 10 + hr2;
+		if (hr > 24) return;
 
 		min1 -= 48;
 		min2 -= 48;
 		int min = min1 * 10 + min2;
+		if (min > 60) return;
 
 		sec1 -= 48;
 		sec2 -= 48;
 		int sec = sec1 * 10 + sec2;
+		if (sec > 60) return;
 
 		// Set time
 		set_time((hr) * (60 * 60) + (min) * (60) + sec);
+		BLE_RECIEVED_FLAG = true;
 		return;
 	} else if ((input->data[0] == 'S') && (input->data[1] == 'T') && (input->data[2] == '=') 
 			&& (input->data[5] == ':')){
@@ -377,27 +369,25 @@ void process_input(struct uart_data_t *input) {
 
 		// Check input conditions
 		int hr1 = (input->data[3]);
-		if ((hr1 > '2') || (hr1 < '0')) return;
-
 		int hr2 = (input->data[4]);
-		if ((hr2 > '9') || (hr2 < '0')) return;
-
 		int min1 = (input->data[6]);
-		if ((min1 > '6') || (min1 < '0')) return;
-
 		int min2 = (input->data[7]);
-		if ((min2 > '9') || (min2 < '0')) return;
+		int sec1 = (input->data[9]);
+		int sec2 = (input->data[10]);
 
 		hr1 -= 48;
 		hr2 -= 48;
 		int hr = hr1 * 10 + hr2;
+		if (hr > 24) return;
 
 		min1 -= 48;
 		min2 -= 48;
 		int min = min1 * 10 + min2;
+		if (min > 60) return;
 
 		// Set time
 		set_time((hr) * (60 * 60) + (min) * (60));
+		BLE_RECIEVED_FLAG = true;
 		return;
 	} else if ((input->data[0] == 'M') && (input->data[1] == 'T') && (input->data[2] == '=')) {
 		// (MT=B)
@@ -409,16 +399,24 @@ void process_input(struct uart_data_t *input) {
 			// Military time = true;
 			set_military_time(true);
 		}
+		BLE_RECIEVED_FLAG = true;
 		return;
 	} else if ((input->data[0] == 'G') && (input->data[1] == 'B') && (input->data[2] == 'P')) {
 		// Request to Get Battery Percentage (GBP)
 		// For now, display percentage on the ring
 		continue_showing_battery_percent();
+		BLE_RECIEVED_FLAG = true;
 		return;
 	} else if ((input->data[0] == 'G') && (input->data[1] == 'B') && (input->data[2] == 'V')) {
 		// Request to Get Battery Voltage (GBV)
 		// For now, display voltage on the ring, using colon as period
 		continue_showing_battery_voltage();
+		BLE_RECIEVED_FLAG = true;
+		return;
+	} else if ((input->data[0] == 'S') && (input->data[1] == 'I')) {
+		// Simulates IMU interrupt, to make developing less painful.
+		simulate_IMU_interrupt();
+		BLE_RECIEVED_FLAG = true;
 		return;
 	}
 }
@@ -429,19 +427,17 @@ void ble_write_thread(void)
 	/* Don't go any further until BLE is initialized */
 	k_sem_take(&ble_init_ok, K_FOREVER);
 
-	for (;;) {
-		while(!DATA_REQUESTED) k_sleep(K_MSEC(10));
-		
-		BLE_recieved_data = k_fifo_get(&tx,
-						     K_FOREVER);
+	while(true) {
+		while(!DATA_REQUESTED) {
+			k_sleep(K_MSEC(10)); // This allows the system to actually do computations
+		}
 
+		BLE_recieved_data = k_fifo_get(&tx, K_SECONDS(1));
 
 		if (bt_nus_send(NULL, BLE_recieved_data->data, BLE_recieved_data->len) == 0) {
 			DATA_REQUESTED = false;
-			BLE_RECIEVED_FLAG = true;
 		}
 		
 		process_input(BLE_recieved_data);
-		resume_main_thread();
 	}
 }

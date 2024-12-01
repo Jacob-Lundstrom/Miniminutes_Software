@@ -663,9 +663,12 @@
 };
 
 &wdt {
+ compatible="nordic,nrf-watchdog";
+
+ interrupts=<16 1>;
  wakeup-source;
  status = "okay";
- zephyr,pm-device-runtime-auto;
+
 };
 # 0 "<command-line>" 2
 # 1 "C:/ncs/v2.6.1/zephyr/misc/empty_file.c"

@@ -12,7 +12,6 @@
 #define BLE_STACKSIZE CONFIG_BT_NUS_THREAD_STACK_SIZE
 
 static struct uart_data_t *BLE_recieved_data;
-static bool BLE_RECIEVED_FLAG = false;
 
 int BLE_init(void);
 

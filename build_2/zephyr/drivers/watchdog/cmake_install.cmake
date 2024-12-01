@@ -1,4 +1,4 @@
-# Install script for directory: C:/ncs/v2.6.1/zephyr/drivers/counter
+# Install script for directory: C:/ncs/v2.6.1/zephyr/drivers/watchdog
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

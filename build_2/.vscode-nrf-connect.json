@@ -3,7 +3,7 @@
   "boardRevision": "",
   "boardDir": "c:/ouroboros-dev/boards/arm/microminutes",
   "shouldBuild": true,
-  "optimizations": "size",
+  "optimizations": "speed",
   "cmakeArgs": [],
   "confFiles": [],
   "buildDirectory": "build_2",

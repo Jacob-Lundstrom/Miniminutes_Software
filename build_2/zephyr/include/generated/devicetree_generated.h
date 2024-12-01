@@ -5794,12 +5794,6 @@
  * Devicetree node: /soc/watchdog@40010000
  *
  * Node identifier: DT_N_S_soc_S_watchdog_40010000
- *
- * Binding (compatible = nordic,nrf-wdt):
- *   $ZEPHYR_BASE\dts\bindings\watchdog\nordic,nrf-wdt.yaml
- *
- * (Descriptions have moved to the Devicetree Bindings Index
- * in the documentation.)
  */
 
 /* Node's full path: */
@@ -5838,9 +5832,9 @@
 
 /* Existence and alternate IDs: */
 #define DT_N_S_soc_S_watchdog_40010000_EXISTS 1
-#define DT_N_INST_0_nordic_nrf_wdt DT_N_S_soc_S_watchdog_40010000
-#define DT_N_NODELABEL_wdt         DT_N_S_soc_S_watchdog_40010000
-#define DT_N_NODELABEL_wdt0        DT_N_S_soc_S_watchdog_40010000
+#define DT_N_INST_0_nordic_nrf_watchdog DT_N_S_soc_S_watchdog_40010000
+#define DT_N_NODELABEL_wdt              DT_N_S_soc_S_watchdog_40010000
+#define DT_N_NODELABEL_wdt0             DT_N_S_soc_S_watchdog_40010000
 
 /* Macros for properties that are special in the specification: */
 #define DT_N_S_soc_S_watchdog_40010000_REG_NUM 1
@@ -5856,17 +5850,29 @@
 #define DT_N_S_soc_S_watchdog_40010000_IRQ_IDX_0_EXISTS 1
 #define DT_N_S_soc_S_watchdog_40010000_IRQ_IDX_0_VAL_priority 1
 #define DT_N_S_soc_S_watchdog_40010000_IRQ_IDX_0_VAL_priority_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_COMPAT_MATCHES_nordic_nrf_wdt 1
+#define DT_N_S_soc_S_watchdog_40010000_COMPAT_MATCHES_nordic_nrf_watchdog 1
 #define DT_N_S_soc_S_watchdog_40010000_COMPAT_VENDOR_IDX_0_EXISTS 1
 #define DT_N_S_soc_S_watchdog_40010000_COMPAT_VENDOR_IDX_0 "Nordic Semiconductor"
 #define DT_N_S_soc_S_watchdog_40010000_COMPAT_MODEL_IDX_0_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_COMPAT_MODEL_IDX_0 "nrf-wdt"
+#define DT_N_S_soc_S_watchdog_40010000_COMPAT_MODEL_IDX_0 "nrf-watchdog"
 #define DT_N_S_soc_S_watchdog_40010000_STATUS_okay 1
 
 /* Pin control (pinctrl-<i>, pinctrl-names) properties: */
 #define DT_N_S_soc_S_watchdog_40010000_PINCTRL_NUM 0
 
 /* Generic property macros: */
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible {"nordic,nrf-watchdog"}
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0 "nordic,nrf-watchdog"
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_STRING_UNQUOTED nordic,nrf-watchdog
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_STRING_TOKEN nordic_nrf_watchdog
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_STRING_UPPER_TOKEN NORDIC_NRF_WATCHDOG
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_EXISTS 1
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM(fn) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0)
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0)
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0, __VA_ARGS__)
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0, __VA_ARGS__)
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_LEN 1
+#define DT_N_S_soc_S_watchdog_40010000_P_compatible_EXISTS 1
 #define DT_N_S_soc_S_watchdog_40010000_P_reg {1073807360 /* 0x40010000 */, 4096 /* 0x1000 */}
 #define DT_N_S_soc_S_watchdog_40010000_P_reg_IDX_0 1073807360
 #define DT_N_S_soc_S_watchdog_40010000_P_reg_IDX_0_EXISTS 1
@@ -5895,22 +5901,6 @@
 #define DT_N_S_soc_S_watchdog_40010000_P_status_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_soc_S_watchdog_40010000, status, 0, __VA_ARGS__)
 #define DT_N_S_soc_S_watchdog_40010000_P_status_LEN 1
 #define DT_N_S_soc_S_watchdog_40010000_P_status_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible {"nordic,nrf-wdt"}
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0 "nordic,nrf-wdt"
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_STRING_UNQUOTED nordic,nrf-wdt
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_STRING_TOKEN nordic_nrf_wdt
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_STRING_UPPER_TOKEN NORDIC_NRF_WDT
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_IDX_0_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM(fn) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0)
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0)
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0, __VA_ARGS__)
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_soc_S_watchdog_40010000, compatible, 0, __VA_ARGS__)
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_LEN 1
-#define DT_N_S_soc_S_watchdog_40010000_P_compatible_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_P_wakeup_source 1
-#define DT_N_S_soc_S_watchdog_40010000_P_wakeup_source_EXISTS 1
-#define DT_N_S_soc_S_watchdog_40010000_P_zephyr_pm_device_runtime_auto 1
-#define DT_N_S_soc_S_watchdog_40010000_P_zephyr_pm_device_runtime_auto_EXISTS 1
 
 /*
  * Devicetree node: /soc/adc@40007000/channel@0
@@ -7427,7 +7417,7 @@
 #define DT_COMPAT_HAS_OKAY_nordic_nrf_rng 1
 #define DT_COMPAT_HAS_OKAY_nordic_nrf_ecb 1
 #define DT_COMPAT_HAS_OKAY_nordic_nrf_ccm 1
-#define DT_COMPAT_HAS_OKAY_nordic_nrf_wdt 1
+#define DT_COMPAT_HAS_OKAY_nordic_nrf_watchdog 1
 #define DT_COMPAT_HAS_OKAY_nordic_nrf_egu 1
 #define DT_COMPAT_HAS_OKAY_nordic_nrf_swi 1
 #define DT_COMPAT_HAS_OKAY_nordic_nrf52_flash_controller 1
@@ -7469,7 +7459,7 @@
 #define DT_N_INST_nordic_nrf_rng_NUM_OKAY 1
 #define DT_N_INST_nordic_nrf_ecb_NUM_OKAY 1
 #define DT_N_INST_nordic_nrf_ccm_NUM_OKAY 1
-#define DT_N_INST_nordic_nrf_wdt_NUM_OKAY 1
+#define DT_N_INST_nordic_nrf_watchdog_NUM_OKAY 1
 #define DT_N_INST_nordic_nrf_egu_NUM_OKAY 2
 #define DT_N_INST_nordic_nrf_swi_NUM_OKAY 6
 #define DT_N_INST_nordic_nrf52_flash_controller_NUM_OKAY 1
@@ -7579,10 +7569,10 @@
 #define DT_FOREACH_OKAY_VARGS_nordic_nrf_ccm(fn, ...) fn(DT_N_S_soc_S_ccm_4000f000, __VA_ARGS__)
 #define DT_FOREACH_OKAY_INST_nordic_nrf_ccm(fn) fn(0)
 #define DT_FOREACH_OKAY_INST_VARGS_nordic_nrf_ccm(fn, ...) fn(0, __VA_ARGS__)
-#define DT_FOREACH_OKAY_nordic_nrf_wdt(fn) fn(DT_N_S_soc_S_watchdog_40010000)
-#define DT_FOREACH_OKAY_VARGS_nordic_nrf_wdt(fn, ...) fn(DT_N_S_soc_S_watchdog_40010000, __VA_ARGS__)
-#define DT_FOREACH_OKAY_INST_nordic_nrf_wdt(fn) fn(0)
-#define DT_FOREACH_OKAY_INST_VARGS_nordic_nrf_wdt(fn, ...) fn(0, __VA_ARGS__)
+#define DT_FOREACH_OKAY_nordic_nrf_watchdog(fn) fn(DT_N_S_soc_S_watchdog_40010000)
+#define DT_FOREACH_OKAY_VARGS_nordic_nrf_watchdog(fn, ...) fn(DT_N_S_soc_S_watchdog_40010000, __VA_ARGS__)
+#define DT_FOREACH_OKAY_INST_nordic_nrf_watchdog(fn) fn(0)
+#define DT_FOREACH_OKAY_INST_VARGS_nordic_nrf_watchdog(fn, ...) fn(0, __VA_ARGS__)
 #define DT_FOREACH_OKAY_nordic_nrf_egu(fn) fn(DT_N_S_soc_S_egu_40014000) fn(DT_N_S_soc_S_egu_40015000)
 #define DT_FOREACH_OKAY_VARGS_nordic_nrf_egu(fn, ...) fn(DT_N_S_soc_S_egu_40014000, __VA_ARGS__) fn(DT_N_S_soc_S_egu_40015000, __VA_ARGS__)
 #define DT_FOREACH_OKAY_INST_nordic_nrf_egu(fn) fn(0) fn(1)
