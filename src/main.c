@@ -6,6 +6,8 @@
 
 // THIS PROGRAM REQUIRES nRF Connect SDK v2.6.1
 // I don't think that the toolchain version matters.
+
+
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
@@ -19,6 +21,9 @@
 #include <zephyr/sys/printk.h>
 
 #include <zephyr/kernel/thread_stack.h>
+
+#include <zephyr/sys/poweroff.h>
+#include <hal/nrf_power.h>
 
 #include "main.h"
 #include "display.h"
@@ -43,12 +48,19 @@ static bool military_time = false;
 K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-// K_THREAD_STACK_DEFINE(ble_thread_stack, BLE_STACKSIZE);
-// static k_tid_t ble_thread_id;
-
 K_THREAD_DEFINE(ble_thread_id, BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
+
+
+
+void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
+	if (show_time || show_percent || show_voltage){
+		return;
+	} else {
+		continue_showing_time();
+	}
+}
 
 void display_timeout_isr(struct k_timer *dummy) {
 	show_time = false;
@@ -66,14 +78,6 @@ void time_increment_isr(struct k_timer *dummy) {
 	return;
 }
 
-void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
-	if (show_time || show_percent || show_voltage){
-		return;
-	} else {
-		continue_showing_time();
-	}
-}
-
 void configure_timers(void) {	
 	k_timer_init(&display_timeout, display_timeout_isr, NULL );
 	k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
@@ -89,17 +93,16 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
+	ADC_init();
 	Display_init();
 	IMU_init();
 	configure_timers();
-	ADC_init();
 }
 
 int thread_main(void) {
 	extern bool BLE_RECIEVED_FLAG;
 
 	SYSTEM_init();
-	
 	while (1) { // Start here at every on-condition
 
 		// Measure the battery before entering the display loop
@@ -107,7 +110,7 @@ int thread_main(void) {
 		battery_p = get_battery_percentage(battery_mv);
 
 		// Enter the display loop
-		if (battery_mv < BATTERY_MIN_VOLTAGE_MV) {
+		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV) & 0){
 				// Make sure that we do nothing if the battery is too low.
 		} else {
 			while(true) {
@@ -173,19 +176,4 @@ void set_military_time(bool status) {
 
 void simulate_IMU_interrupt(void) {
 	continue_showing_time();
-}
-
-void reset_BLE(void) {
-	// k_thread_abort(ble_thread_id);
-	// start_BLE_thread();
-}
-
-void start_BLE_thread(void){
-    // k_thread_create(
-    //     &ble_thread_id,
-	// 	ble_thread_stack,
-	// 	K_THREAD_STACK_SIZEOF(ble_thread_stack),
-    //     BLE_init,
-    //     NULL, NULL, NULL,
-    //     PRIORITY, 0, K_NO_WAIT);
 }

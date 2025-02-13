@@ -1,9 +1,14 @@
 {
-  "board": "microminutes",
+  "toolchainPath": "c:\\ncs\\toolchains\\2d382dcd92",
+  "sdkPath": "c:\\ncs\\v2.6.1",
+  "board": "microminutes_v1_1",
+  "boardDirs": [
+    "c:/ouroboros-dev/boards/arm/microminutes_v1_1"
+  ],
   "boardRevision": "",
-  "boardDir": "c:/ouroboros-dev/boards/arm/microminutes",
+  "boardDir": "c:/ouroboros-dev/boards/arm/microminutes_v1_1",
   "shouldBuild": true,
-  "optimizations": "none",
+  "optimizations": "debug",
   "cmakeArgs": [],
   "confFiles": [],
   "buildDirectory": "build",

@@ -29,8 +29,6 @@
 
 #include "main.h"
 #include "bluetooth.h"
-#include "watchdog.h"
-
 
 #define BT_LE_ADV_CONN_CUSTOM  BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, 0x0b40, 0x0b40, NULL)
 #define PRIORITY 7
@@ -324,7 +322,6 @@ int BLE_init(void)
 		return 0;
 	}
 
-	// watchdog_init();
 	ble_write_thread();
 }
 

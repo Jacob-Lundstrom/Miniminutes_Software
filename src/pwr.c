@@ -43,6 +43,7 @@ uint32_t read_battery_voltage(void) {
 		err = adc_read_dt(&adc_channels[i], &sequence);
 		if (err < 0) {
 			// printk("Could not read (%d)\n", err);
+			rdgs--;
 			continue;
 		}
 
@@ -67,6 +68,7 @@ uint32_t read_battery_voltage(void) {
 		}
 	}
 	}
+	if (rdgs == 0) return 0;
 	return (avg / rdgs) * BATTERY_ADC_SCALE_FACTOR;
 }
 
