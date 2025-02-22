@@ -63,9 +63,11 @@ void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t
 }
 
 void display_timeout_isr(struct k_timer *dummy) {
-	show_time = false;
-	show_percent = false;
-	show_voltage = false;
+	if (!(always_on || (always_on_while_charging && is_charging))) {
+		show_time = false;
+		show_percent = false;
+		show_voltage = false;
+	}
 	k_timer_stop(&display_timeout);
 }
 
@@ -104,34 +106,34 @@ int thread_main(void) {
 	extern bool BLE_RECIEVED_FLAG;
 
 	SYSTEM_init();
-	
-	disableSegments();
-	k_thread_suspend(thread_main_id);
 
 	while (1) { // Start here at every on-condition
 
-		// Measure the battery before entering the display loop
-		battery_mv = read_battery_voltage();
-		battery_p = get_battery_percentage(battery_mv);
+		main_thread_enabled = true;
 
 		// Enter the display loop
-		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV) & 0){
-				// Make sure that we do nothing if the battery is too low.
-		} else {
-			while(true) {
-				if (show_time) {
-					display_time_seconds_mil(SYSTEM_TIME_SECONDS, military_time);
-				} else if (show_percent) {
-					display_percent(battery_p);
-				} else if (show_voltage) {
-					display_battery_voltage_mv(battery_mv);
-				} else {
-					break; // If this statement is reached, this means that the display timeout has executed.
-				}
+		while(true) {
+			
+			battery_mv = read_battery_voltage();
+			battery_p = get_battery_percentage(battery_mv);
+			if ((battery_mv < BATTERY_MIN_VOLTAGE_MV)){
+					// Make sure that we do nothing if the battery is too low.
+					break;
 			}
-			BLE_RECIEVED_FLAG = false;
+
+			if (show_time) {
+				display_time_seconds_mil(SYSTEM_TIME_SECONDS, military_time);
+			} else if (show_percent) {
+				display_percent(battery_p);
+			} else if (show_voltage) {
+				display_battery_voltage_mv(battery_mv);
+			} else {
+				break; // If this statement is reached, this means that the display timeout has executed.
+			}
 		}
+		BLE_RECIEVED_FLAG = false;
 		disableSegments();
+		main_thread_enabled = false;
 		k_thread_suspend(thread_main_id);
 	}
 	return 0;
@@ -139,14 +141,17 @@ int thread_main(void) {
 
 void resume_main_thread(void) {
 	k_thread_resume(thread_main_id);
-	k_timer_init(&display_timeout, display_timeout_isr, NULL );
-	k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
+	if (!main_thread_enabled) {
+		k_timer_init(&display_timeout, display_timeout_isr, NULL);
+		k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
+	}
 }
 
 void continue_showing_time(void){
 	show_time = true;
 	show_percent = false;
 	show_voltage = false;
+	
 	resume_main_thread();
 }
 
@@ -181,4 +186,18 @@ void set_military_time(bool status) {
 
 void simulate_IMU_interrupt(void) {
 	continue_showing_time();
+}
+
+void set_always_on(bool state) {
+	always_on = state;
+	if (always_on) {
+		simulate_IMU_interrupt();
+	}
+}
+
+void set_always_on_while_charging(bool state) {
+	always_on_while_charging = state;
+	if (is_charging) {
+		simulate_IMU_interrupt();
+	}
 }

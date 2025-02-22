@@ -8642,6 +8642,7 @@
 
 /* Existence and alternate IDs: */
 #define DT_N_S_soc_S_watchdog_40010000_EXISTS 1
+#define DT_N_ALIAS_watchdog0            DT_N_S_soc_S_watchdog_40010000
 #define DT_N_INST_0_nordic_nrf_watchdog DT_N_S_soc_S_watchdog_40010000
 #define DT_N_NODELABEL_wdt              DT_N_S_soc_S_watchdog_40010000
 #define DT_N_NODELABEL_wdt0             DT_N_S_soc_S_watchdog_40010000

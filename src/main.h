@@ -15,6 +15,10 @@ static uint32_t SYSTEM_TIME_SECONDS;
 static bool show_time;
 static bool show_percent;
 static bool show_voltage;
+static bool always_on;
+static bool always_on_while_charging;
+static bool is_charging;
+static bool main_thread_enabled;
 
 
 static int battery_mv;
@@ -40,3 +44,6 @@ void simulate_IMU_interrupt(void);
 void reset_BLE(void);
 
 void start_BLE_thread(void);
+
+void set_always_on(bool state);
+void set_always_on_while_charging(bool state);

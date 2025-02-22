@@ -5,6 +5,7 @@ set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,flash-contr
 set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,sram" "/soc/memory@20000000")
 set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,flash" "/soc/flash-controller@4001e000/flash@0")
 set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,code-partition" "/soc/flash-controller@4001e000/flash@0/partitions/partition@c000")
+set_target_properties(devicetree_target PROPERTIES "DT_ALIAS|watchdog0" "/soc/watchdog@40010000")
 set_target_properties(devicetree_target PROPERTIES "DT_ALIAS|ca1" "/leds/segment_1_high")
 set_target_properties(devicetree_target PROPERTIES "DT_ALIAS|ca2" "/leds/segment_2_high")
 set_target_properties(devicetree_target PROPERTIES "DT_ALIAS|ca3" "/leds/segment_3_high")

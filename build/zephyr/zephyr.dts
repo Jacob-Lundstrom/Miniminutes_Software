@@ -26,6 +26,7 @@
 		cc6 = &cathode6;
 		cc7 = &cathode7;
 		int1 = &int1;
+		watchdog0 = &wdt0;
 	};
 	soc {
 		#address-cells = < 0x1 >;

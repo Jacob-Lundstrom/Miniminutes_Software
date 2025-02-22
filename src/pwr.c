@@ -28,7 +28,7 @@ int ADC_init(void) {
 
 uint32_t read_battery_voltage(void) {
 	uint32_t avg = 0;
-	int rdgs = 100;
+	int rdgs = 1;
 	// printk("ADC reading[%u]:\n", count++);
 	for(int k = 0; k < rdgs; k++) {
 	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++) {

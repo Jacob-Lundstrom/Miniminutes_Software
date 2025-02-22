@@ -222,7 +222,7 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 	char addr[BT_ADDR_LE_STR_LEN] = {0}; 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
 	
-	if (BLE_RECIEVED_FLAG) return; // Make sure we're not in the middle of displaying something.
+	// if (BLE_RECIEVED_FLAG) return; // Make sure we're not in the middle of displaying something.
 	// If we are, ignore this packet and wait.
 
 	struct uart_data_t *ble_tx_buf = k_malloc(sizeof(*ble_tx_buf));
@@ -415,6 +415,13 @@ void process_input(struct uart_data_t *input) {
 		simulate_IMU_interrupt();
 		BLE_RECIEVED_FLAG = true;
 		return;
+	} else if ((input->data[0] == 'A') && (input->data[1] == 'O') && (input->data[2] == '=') && ((input->data[3] == '0') || (input->data[3] == '1'))) {
+		bool req = false;
+		if (input->data[3] == '1') req = true;
+		set_always_on(req);
+		BLE_RECIEVED_FLAG = true;
+	} else if ((input->data[0] == 'A') && (input->data[1] == 'O') && (input->data[2] == 'W') && (input->data[3] == 'C') && (input->data[4] == '=') && ((input->data[5] == '0') || (input->data[5] == '1'))) {
+		// set_always_on_while_charging(input->data[3]);
 	}
 }
 

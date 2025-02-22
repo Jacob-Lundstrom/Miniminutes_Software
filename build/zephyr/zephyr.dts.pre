@@ -724,6 +724,9 @@
   cc7 = &cathode7;
 
   int1 = &int1;
+
+
+  watchdog0 = &wdt0;
  };
 
  leds {
@@ -925,6 +928,7 @@
   zephyr,resolution = <12>;
  };
 };
+
 &nfct {
  status = "okay";
 };
