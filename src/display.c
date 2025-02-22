@@ -401,15 +401,19 @@ void display_percent(int percent) {
 
 void display_battery_voltage_mv(int mv) {
 	if (mv > 0) {
-		int dig1 = mv / 10000; // Should always be zero or something is going very wrong
-		int dig2 = mv / 1000 - dig1 * 10;
-		int dig3 = mv / 100 - dig1 * 100 - dig2 * 10;
-		int dig4 = mv / 10 - dig1 * 1000 - dig2 * 100 - dig3 * 10;
+		int dig1 = mv / 1000;
+		int dig2 = mv / 100 - dig1 * 10;
+		int dig3 = mv / 10 - dig1 * 100 - dig2 * 10;
+		int dig4 = mv / 1 - dig1 * 1000 - dig2 * 100 - dig3 * 10;
 
-		if (dig1 == 0) {
-			dig1 = -1; // Don't show the highest hour time if using non-24 hr time.
+		if (mv > 9999) {
+			dig1 = 9;
+			dig2 = 9;
+			dig3 = 9;
+			dig4 = 9;
 		}
-		displayTime(dig1, dig2, true, dig3, dig4);
+
+		display_word_chars(dig1, '_', dig2, dig3, dig4);
 	} else {
 		display_error(99);
 	}

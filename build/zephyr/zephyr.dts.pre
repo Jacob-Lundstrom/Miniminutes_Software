@@ -916,20 +916,13 @@
  #address-cells = <1>;
  #size-cells = <0>;
  status = "okay";
- channel@0 {
-  reg = <0>;
-  zephyr,gain = "ADC_GAIN_1_6";
-  zephyr,reference = "ADC_REF_INTERNAL";
-  zephyr,acquisition-time = <0>;
-  zephyr,input-positive = <2>;
-  zephyr,resolution = <12>;
- };
-
  channel@2 {
   reg = <2>;
   zephyr,gain = "ADC_GAIN_1_6";
-  zephyr,reference = "ADC_REF_VDD_1";
+  zephyr,reference = "ADC_REF_INTERNAL";
   zephyr,acquisition-time = <0>;
+  zephyr,input-positive = <3>;
+  zephyr,resolution = <12>;
  };
 };
 &nfct {

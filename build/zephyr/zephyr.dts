@@ -177,19 +177,13 @@
 			#address-cells = < 0x1 >;
 			#size-cells = < 0x0 >;
 			phandle = < 0x7 >;
-			channel@0 {
-				reg = < 0x0 >;
-				zephyr,gain = "ADC_GAIN_1_6";
-				zephyr,reference = "ADC_REF_INTERNAL";
-				zephyr,acquisition-time = < 0x0 >;
-				zephyr,input-positive = < 0x2 >;
-				zephyr,resolution = < 0xc >;
-			};
 			channel@2 {
 				reg = < 0x2 >;
 				zephyr,gain = "ADC_GAIN_1_6";
-				zephyr,reference = "ADC_REF_VDD_1";
+				zephyr,reference = "ADC_REF_INTERNAL";
 				zephyr,acquisition-time = < 0x0 >;
+				zephyr,input-positive = < 0x3 >;
+				zephyr,resolution = < 0xc >;
 			};
 		};
 		timer0: timer@40008000 {
