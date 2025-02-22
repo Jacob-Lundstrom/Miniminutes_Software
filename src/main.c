@@ -48,7 +48,7 @@ static bool military_time = false;
 K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(ble_thread_id, BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
 
@@ -100,9 +100,14 @@ void SYSTEM_init(void) {
 }
 
 int thread_main(void) {
+
 	extern bool BLE_RECIEVED_FLAG;
 
 	SYSTEM_init();
+	
+	disableSegments();
+	k_thread_suspend(thread_main_id);
+
 	while (1) { // Start here at every on-condition
 
 		// Measure the battery before entering the display loop

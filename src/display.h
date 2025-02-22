@@ -16,6 +16,7 @@
 #define CC6_NODE DT_ALIAS(cc6)
 #define CC7_NODE DT_ALIAS(cc7)
 
+#define SEGMENT_MIN_ON_TIME_US 1000
 
 static const struct gpio_dt_spec CA1 = GPIO_DT_SPEC_GET(CA1_NODE, gpios);
 static const struct gpio_dt_spec CA2 = GPIO_DT_SPEC_GET(CA2_NODE, gpios);
@@ -44,6 +45,11 @@ void displayOff();
 void display_time_seconds(int current_time_seconds);
 void display_time_seconds_mil(int current_time_seconds, bool military_time);
 void display_battery_voltage_mv(int mv);
-void display_error(void);
+void display_error(uint8_t error_number);
 void display_credits(void);
 void display_percent(int percent);
+uint8_t num_to_segment(uint8_t number);
+uint8_t char_to_segment(uint8_t character);
+void display_arb_all(uint8_t s1, uint8_t s2, uint8_t s3, uint8_t s4, uint8_t s5);
+void display_word_chars(char c1, char c2, char c3, char c4, char c5);
+void display_word(char *word, int len);

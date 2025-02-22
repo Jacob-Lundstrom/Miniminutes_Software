@@ -797,6 +797,11 @@
    gpios = <&gpio0 31 ((1 << 0) | (1 << 4))>;
    label = "Int1";
   };
+
+  chrgstat: chrgstat {
+   gpios = <&gpio0 5 ((1 << 0) | (1 << 4))>;
+   label = "chrgStat";
+  };
  };
 
  zephyr,user {
@@ -877,6 +882,7 @@
  i2c0_default: i2c0_default {
   group1 {
    psels = <((((((0) * 32U) + (1)) & 0x7FU) << 0U) | ((11U & 0xFFFFU) << 16U))>, <((((((0) * 32U) + (0)) & 0x7FU) << 0U) | ((12U & 0xFFFFU) << 16U))>;
+   bias-pull-up;
   };
  };
 };
@@ -886,7 +892,11 @@
 };
 
 &radio {
- ble-2mbps-supported;
+ /delete-property/ ble-2mbps-supported;
+ /delete-property/ ble-coded-phy-supported;
+ /delete-property/ tx-high-power-supported;
+ /delete-property/ dfe-supported;
+ /delete-property/ ieee802154-supported;
 };
 
 &timer0 {
@@ -914,6 +924,13 @@
   zephyr,input-positive = <2>;
   zephyr,resolution = <12>;
  };
+
+ channel@2 {
+  reg = <2>;
+  zephyr,gain = "ADC_GAIN_1_6";
+  zephyr,reference = "ADC_REF_VDD_1";
+  zephyr,acquisition-time = <0>;
+ };
 };
 &nfct {
  status = "okay";
@@ -922,6 +939,30 @@
 &uicr {
  status = "disabled";
  nfct-pins-as-gpios;
+};
+
+&rng {
+ status = "okay";
+};
+
+&ecb {
+ status = "okay";
+};
+
+&ccm {
+ status = "okay";
+};
+
+&acl {
+ status = "okay";
+};
+
+&timer1 {
+ status = "okay";
+};
+
+&timer2 {
+ status = "okay";
 };
 # 0 "<command-line>" 2
 # 1 "C:/ncs/v2.6.1/zephyr/misc/empty_file.c"

@@ -56,7 +56,9 @@ void enableInt1() {
 }
 
 void IMU_init(void) {
+
 	enableInt1();
+
 
 	int ret;
 
