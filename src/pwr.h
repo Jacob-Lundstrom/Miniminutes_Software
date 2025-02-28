@@ -1,3 +1,6 @@
+#ifndef PWR_H
+#define PWR_H
+
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -27,7 +30,12 @@ static const struct adc_dt_spec adc_channels[] = {
 #define BATTERY_MIN_VOLTAGE_MV 3500
 #define BATTERY_MAX_VOLTAGE_MV 4200
 
+#define GREEN_MIN_PERCENT 0.4
+#define RED_MAX_PERCENT 0.6
+
 int ADC_init(void);
 
 uint32_t read_battery_voltage(void);
 uint8_t get_battery_percentage(uint32_t battery_mv);
+
+#endif

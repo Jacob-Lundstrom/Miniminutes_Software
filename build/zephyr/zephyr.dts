@@ -106,7 +106,11 @@
 			compatible = "nordic,nrf-uarte";
 			reg = < 0x40002000 0x1000 >;
 			interrupts = < 0x2 0x1 >;
-			status = "disabled";
+			status = "okay";
+			current-speed = < 0x1c200 >;
+			pinctrl-0 = < &uart0_default >;
+			pinctrl-1 = < &uart0_sleep >;
+			pinctrl-names = "default", "sleep";
 		};
 		i2c0: i2c@40003000 {
 			compatible = "nordic,nrf-twim";
@@ -167,7 +171,7 @@
 			interrupts = < 0x6 0x5 >;
 			status = "okay";
 			instance = < 0x0 >;
-			phandle = < 0x3 >;
+			phandle = < 0x5 >;
 		};
 		adc: adc@40007000 {
 			compatible = "nordic,nrf-saadc";
@@ -177,7 +181,7 @@
 			#io-channel-cells = < 0x1 >;
 			#address-cells = < 0x1 >;
 			#size-cells = < 0x0 >;
-			phandle = < 0x7 >;
+			phandle = < 0x9 >;
 			channel@2 {
 				reg = < 0x2 >;
 				zephyr,gain = "ADC_GAIN_1_6";
@@ -204,7 +208,7 @@
 			max-bit-width = < 0x20 >;
 			interrupts = < 0x9 0x1 >;
 			prescaler = < 0x0 >;
-			phandle = < 0x4 >;
+			phandle = < 0x6 >;
 		};
 		timer2: timer@4000a000 {
 			compatible = "nordic,nrf-timer";
@@ -480,7 +484,7 @@
 			status = "okay";
 			port = < 0x0 >;
 			gpiote-instance = < &gpiote >;
-			phandle = < 0x5 >;
+			phandle = < 0x7 >;
 		};
 		gpio1: gpio@50000300 {
 			compatible = "nordic,nrf-gpio";
@@ -491,13 +495,26 @@
 			status = "okay";
 			port = < 0x1 >;
 			gpiote-instance = < &gpiote >;
-			phandle = < 0x6 >;
+			phandle = < 0x8 >;
 		};
 	};
 	pinctrl: pin-controller {
 		compatible = "nordic,nrf-pinctrl";
-		i2c0_default: i2c0_default {
+		uart0_default: uart0_default {
 			phandle = < 0x2 >;
+			group1 {
+				psels = < 0x6 >, < 0x10008 >, < 0x20005 >, < 0x30007 >;
+			};
+		};
+		uart0_sleep: uart0_sleep {
+			phandle = < 0x3 >;
+			group1 {
+				psels = < 0x6 >, < 0x10008 >, < 0x20005 >, < 0x30007 >;
+				low-power-enable;
+			};
+		};
+		i2c0_default: i2c0_default {
+			phandle = < 0x4 >;
 			group1 {
 				psels = < 0xb0001 >, < 0xc0000 >;
 				bias-pull-up;

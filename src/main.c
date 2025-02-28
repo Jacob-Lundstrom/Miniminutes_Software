@@ -97,7 +97,7 @@ void SYSTEM_init(void) {
 
 	ADC_init();
 	Display_init();
-	IMU_init();
+	// IMU_init();
 	configure_timers();
 }
 
@@ -106,6 +106,12 @@ int thread_main(void) {
 	extern bool BLE_RECIEVED_FLAG;
 
 	SYSTEM_init();
+
+	// while(1) {
+	// 	// display_word("Good ", 5, 1, 0);
+	// 	// display_word("     ", 5, 1, 0);
+	// 	// display_credits();
+	// }
 
 	while (1) { // Start here at every on-condition
 

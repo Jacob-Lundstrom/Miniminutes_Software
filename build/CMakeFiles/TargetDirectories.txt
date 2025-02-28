@@ -201,6 +201,9 @@ C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/i2c/CM
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/pinctrl/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/pinctrl/CMakeFiles/drivers__pinctrl.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/pinctrl/CMakeFiles/rebuild_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/serial/CMakeFiles/drivers__serial.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/serial/CMakeFiles/edit_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/serial/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/timer/CMakeFiles/drivers__timer.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/timer/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/timer/CMakeFiles/rebuild_cache.dir
