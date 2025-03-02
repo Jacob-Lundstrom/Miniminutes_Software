@@ -8,6 +8,11 @@
 	chosen {
 		zephyr,entropy = &rng;
 		zephyr,flash-controller = &flash_controller;
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+		zephyr,uart-mcumgr = &uart0;
+		zephyr,bt-mon-uart = &uart0;
+		zephyr,bt-c2h-uart = &uart0;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 		zephyr,code-partition = &slot0_partition;
@@ -123,10 +128,25 @@
 			status = "okay";
 			pinctrl-0 = < &i2c0_default >;
 			pinctrl-names = "default";
-			lis2dw12tr: lis2dw12tr@19 {
+			lis2dw12: lis2dw12@19 {
 				compatible = "i2c-device";
-				label = "LIS2DW12TR";
+				label = "LIS2DW12";
 				reg = < 0x19 >;
+			};
+			rv_8263_c8: rv_8263_c8@51 {
+				compatible = "i2c-device";
+				label = "RV-8263-C8";
+				reg = < 0x51 >;
+			};
+			apds_9253_001: apds_9253_001@52 {
+				compatible = "i2c-device";
+				label = "APDS-9253-001";
+				reg = < 0x52 >;
+			};
+			is31fl3294: is31fl3294@74 {
+				compatible = "i2c-device";
+				label = "IS31FL3294";
+				reg = < 0x74 >;
 			};
 		};
 		spi0: spi@40003000 {
@@ -255,11 +275,12 @@
 			status = "okay";
 		};
 		wdt: wdt0: watchdog@40010000 {
-			compatible = "nordic,nrf-watchdog";
+			compatible = "nordic,nrf-wdt";
 			reg = < 0x40010000 0x1000 >;
 			interrupts = < 0x10 0x1 >;
 			status = "okay";
 			wakeup-source;
+			zephyr,pm-device-runtime-auto;
 		};
 		rtc1: rtc@40011000 {
 			compatible = "nordic,nrf-rtc";

@@ -721,6 +721,12 @@
  compatible = "Jacob-Lundstrom,microminutes-v1-1";
 
  chosen {
+  zephyr,console = &uart0;
+  zephyr,shell-uart = &uart0;
+  zephyr,uart-mcumgr = &uart0;
+  zephyr,bt-mon-uart = &uart0;
+  zephyr,bt-c2h-uart = &uart0;
+
   zephyr,sram = &sram0;
   zephyr,flash = &flash0;
   zephyr,code-partition = &slot0_partition;
@@ -881,12 +887,40 @@
  pinctrl-names = "default";
  clock-frequency = <100000>;
 
- lis2dw12tr: lis2dw12tr@19{
+ lis2dw12: lis2dw12@19{
   compatible="i2c-device";
-  label="LIS2DW12TR";
+  label="LIS2DW12";
   reg = <0x19>;
 
  };
+# 190 "C:/ouroboros-dev/boards/arm/microminutes_v1_1/microminutes_v1_1.dts"
+ rv_8263_c8: rv_8263_c8@51{
+  compatible="i2c-device";
+  label="RV-8263-C8";
+  reg = <0x51>;
+
+ };
+# 205 "C:/ouroboros-dev/boards/arm/microminutes_v1_1/microminutes_v1_1.dts"
+ apds_9253_001: apds_9253_001@52{
+  compatible="i2c-device";
+  label="APDS-9253-001";
+  reg = <0x52>;
+
+ };
+
+ is31fl3294: is31fl3294@74{
+  compatible="i2c-device";
+  label="IS31FL3294";
+  reg = <0x74>;
+
+ };
+
+
+
+
+
+
+
 };
 
 &rtc0 {
@@ -925,12 +959,12 @@
 };
 
 &wdt {
- compatible="nordic,nrf-watchdog";
+ compatible="nordic,nrf-wdt";
 
  interrupts=<16 1>;
  wakeup-source;
  status = "okay";
-
+ zephyr,pm-device-runtime-auto;
 };
 
 &adc {

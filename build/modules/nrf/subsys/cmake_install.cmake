@@ -44,6 +44,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/bootloader/bl_override/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/net/cmake_install.cmake")
 endif()
 
@@ -65,5 +70,10 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
   include("C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/debug/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/partition_manager/cmake_install.cmake")
 endif()
 

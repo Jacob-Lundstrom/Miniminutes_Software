@@ -30,6 +30,12 @@
 #include "imu.h"
 #include "bluetooth.h"
 #include "pwr.h"
+#include "hr.h"
+#include "rtc.h"
+
+#define LOG_LEVEL LOG_LEVEL_DBG
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(smp_sample);
 
 #define ALARM_CHANNEL_ID 0
 #define TIMER DT_NODELABEL(rtc0)
@@ -45,11 +51,11 @@ static bool military_time = false;
 
 #define TIMER_DEVICE_NODE DT_NODELABEL(timer0)
 
-K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main_DEV, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+// 		PRIORITY, 0, 0);
 
 
 
@@ -97,8 +103,32 @@ void SYSTEM_init(void) {
 
 	ADC_init();
 	Display_init();
-	// IMU_init();
+	IMU_init();
 	configure_timers();
+	RTC_init();
+	HR_init();
+}
+
+int thread_main_DEV(void) {
+	// TODO:
+	// Test all the functions that I wrote for the RTC
+	// Write a processing algorithm that measures heart rate
+	// Write the handling funcitons that allow for saving to flash
+	// This should be used as a development thread.
+	SYSTEM_init();
+	// HR_disable();
+	RTC_set_time(1, 5, 0);
+
+	while(1) {
+		if (RTC_get_time() % 2) {
+			illuminate_green(10);
+			// turn_off_red();
+		} else {
+			// illuminate_red(10);
+			turn_off_green();
+		}
+		k_msleep(100);
+	}
 }
 
 int thread_main(void) {
@@ -108,9 +138,10 @@ int thread_main(void) {
 	SYSTEM_init();
 
 	// while(1) {
-	// 	// display_word("Good ", 5, 1, 0);
-	// 	// display_word("     ", 5, 1, 0);
-	// 	// display_credits();
+	// 	display_arb(2,1);
+	// 	k_msleep(1000);
+	// 	display_arb(1,1);
+	// 	k_msleep(1000);
 	// }
 
 	while (1) { // Start here at every on-condition

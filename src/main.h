@@ -25,6 +25,7 @@ static int battery_mv;
 static int battery_p;
 static int reset_ble_required;
 
+int thread_main_DEV(void);
 int thread_main(void);
 
 void resume_main_thread(void);

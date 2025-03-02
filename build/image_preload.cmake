@@ -1,6 +1,6 @@
 # Generated file that can be used to preload variant images
 set(BOARD "microminutes_v1_1" CACHE INTERNAL "NCS child image controlled")
-set(BOARD_ROOT "c:/ouroboros-dev;c:/ouroboros-dev/board_programs/blinky_1;C:/ncs/v2.6.1/nrf;C:/ncs/v2.6.1/zephyr" CACHE INTERNAL "NCS child image controlled")
+set(BOARD_ROOT "c:/ouroboros-dev;c:/ouroboros-dev/board_programs/blinky_1;c:/ncs/v2.6.1/zephyr/samples/subsys/mgmt/mcumgr/smp_svr;C:/ncs/v2.6.1/nrf;C:/ncs/v2.6.1/zephyr" CACHE INTERNAL "NCS child image controlled")
 set(CACHED_CONF_FILE "C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/prj.conf" CACHE INTERNAL "NCS child image controlled")
 set(CLI_CONFIG_DEBUG_OPTIMIZATIONS "y" CACHE INTERNAL "NCS child image controlled")
 set(CLI_CONFIG_DEBUG_THREAD_INFO "y" CACHE INTERNAL "NCS child image controlled")

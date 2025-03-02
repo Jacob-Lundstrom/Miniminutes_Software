@@ -30,7 +30,7 @@ BOARD_DIR:PATH=C:/ouroboros-dev/boards/arm/microminutes_v1_1
 BOARD_EXTENSIONS:BOOL=ON
 
 //No help, variable specified on the command line.
-BOARD_ROOT:UNINITIALIZED=c:/ouroboros-dev;c:/ouroboros-dev/board_programs/blinky_1
+BOARD_ROOT:UNINITIALIZED=c:/ouroboros-dev;c:/ouroboros-dev/board_programs/blinky_1;c:/ncs/v2.6.1/zephyr/samples/subsys/mgmt/mcumgr/smp_svr
 
 //Path to a program.
 BOSSAC:FILEPATH=BOSSAC-NOTFOUND
@@ -384,6 +384,9 @@ ZEPHYR_BASE:PATH=C:/ncs/v2.6.1/zephyr
 //Path to Zephyr git repository index file
 ZEPHYR_GIT_INDEX:PATH=C:/ncs/v2.6.1/zephyr/.git/index
 
+//Path to merged image in Intel Hex format
+ZEPHYR_RUNNER_CONFIG_KERNEL_HEX:STRING=
+
 //Value Computed by CMake
 Zephyr-Kernel_BINARY_DIR:STATIC=C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build
 
@@ -413,6 +416,9 @@ blinky_1_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 blinky_1_SOURCE_DIR:STATIC=C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes
+
+//Extra config fragments for mcuboot child image
+mcuboot_OVERLAY_CONFIG:STRING=;C:/ncs/v2.6.1/nrf/subsys/partition_manager/partition_manager_enabled.conf
 
 
 ########################
@@ -532,7 +538,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=162
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=163
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -580,7 +586,7 @@ FIND_PACKAGE_MESSAGE_DETAILS_Dtc:INTERNAL=[C:/ncs/toolchains/2d382dcd92/opt/bin/
 //Details about finding GnuLd
 FIND_PACKAGE_MESSAGE_DETAILS_GnuLd:INTERNAL=[c:/ncs/toolchains/2d382dcd92/opt/zephyr-sdk/arm-zephyr-eabi/bin/../lib/gcc/arm-zephyr-eabi/12.2.0/../../../../arm-zephyr-eabi/bin/ld.bfd.exe][v2.38()]
 //Details about finding Python3
-FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[C:/ncs/toolchains/2d382dcd92/opt/bin/python.exe][cfound components: Interpreter ][v3.12.4(3.8)]
+FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[C:/ncs/toolchains/2d382dcd92/opt/bin/python.exe][cfound components: Interpreter ][v3.12.4()]
 SOC_LINKER_SCRIPT:INTERNAL=C:/ncs/v2.6.1/zephyr/include/zephyr/arch/arm/cortex_m/scripts/linker.ld
 //West
 WEST:INTERNAL=C:/ncs/toolchains/2d382dcd92/opt/bin/python.exe;-m;west

@@ -17,7 +17,7 @@ config:
   board_dir: C:/ouroboros-dev/boards/arm/microminutes_v1_1
   # Build outputs:
   elf_file: zephyr.elf
-  hex_file: zephyr.hex
+  hex_file: merged.hex
   bin_file: zephyr.bin
   # Host tools:
   gdb: C:/ncs/toolchains/2d382dcd92/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb.exe

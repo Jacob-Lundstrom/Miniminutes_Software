@@ -1,0 +1,13 @@
+# Target labels
+ mcuboot_subimage
+# Source files and their labels
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_subimage
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_subimage.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_subimage-complete.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-build.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-configure.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-download.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-install.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-mkdir.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-patch.rule
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-update.rule

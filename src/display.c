@@ -117,6 +117,8 @@ int Display_init() {
 	if (ret < 0) {
 		return 0;
 	}
+
+	return 0;
 }
 
 
@@ -532,9 +534,6 @@ void display_arb(int segment, uint8_t data) {
 
 	enableSegment(segment);
 	k_usleep(SEGMENT_MIN_ON_TIME_US);
-
-	// Ensure that this segment turns off at this time
-	displayNone();
 }
 
 

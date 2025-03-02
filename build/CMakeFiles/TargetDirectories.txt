@@ -18,7 +18,12 @@ C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/code_data_
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/runners_yaml_props_target.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/pristine.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/app.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/partition_manager.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/mcuboot_primary_app_hex.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/mcuboot_primary_hex.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/merged_hex.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/edit_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/CMakeFiles/partition_manager_report.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/CMakeFiles/linker_zephyr_prebuilt_script_target.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/CMakeFiles/zephyr_pre0.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/CMakeFiles/offsets.dir
@@ -201,9 +206,6 @@ C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/i2c/CM
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/pinctrl/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/pinctrl/CMakeFiles/drivers__pinctrl.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/pinctrl/CMakeFiles/rebuild_cache.dir
-C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/serial/CMakeFiles/drivers__serial.dir
-C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/serial/CMakeFiles/edit_cache.dir
-C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/serial/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/timer/CMakeFiles/drivers__timer.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/timer/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/zephyr/drivers/timer/CMakeFiles/rebuild_cache.dir
@@ -242,6 +244,8 @@ C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/bl
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/bluetooth/services/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/bluetooth/host_extensions/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/bluetooth/host_extensions/CMakeFiles/rebuild_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/bootloader/bl_override/CMakeFiles/edit_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/bootloader/bl_override/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/net/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/net/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/net/lib/CMakeFiles/edit_cache.dir
@@ -260,6 +264,8 @@ C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/sh
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/shell/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/debug/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/debug/CMakeFiles/rebuild_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/partition_manager/CMakeFiles/edit_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/subsys/partition_manager/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/modules/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/modules/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/modules/hostap/CMakeFiles/edit_cache.dir
@@ -287,6 +293,12 @@ C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/tests/CMa
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/tests/mocks/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/nrf/tests/mocks/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/edit_cache.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_sign_target.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_menuconfig.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_shared_property_target.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_subimage.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/mcuboot_guiconfig.dir
+C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/dfu_application_zip.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/CMakeFiles/rebuild_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/boot/bootutil/zephyr/CMakeFiles/edit_cache.dir
 C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/build/modules/mcuboot/boot/bootutil/zephyr/CMakeFiles/rebuild_cache.dir

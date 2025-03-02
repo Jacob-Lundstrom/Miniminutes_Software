@@ -30,8 +30,8 @@ static const struct adc_dt_spec adc_channels[] = {
 #define BATTERY_MIN_VOLTAGE_MV 3500
 #define BATTERY_MAX_VOLTAGE_MV 4200
 
-#define GREEN_MIN_PERCENT 0.4
-#define RED_MAX_PERCENT 0.6
+#define GREEN_MIN_PERCENT 40
+#define RED_MAX_PERCENT 60
 
 int ADC_init(void);
 

@@ -39,6 +39,7 @@ zephyr/linker.cmd: \
   C:/ncs/v2.6.1/zephyr/include/zephyr/kernel/mm.h \
   C:/ncs/v2.6.1/zephyr/include/zephyr/kernel/internal/mm.h \
   C:/ncs/v2.6.1/zephyr/include/zephyr/kernel/mm/demand_paging.h \
+  zephyr/include/generated/pm_config.h \
   C:/ncs/v2.6.1/zephyr/include/zephyr/linker/linker-devnull.h \
   C:/ncs/v2.6.1/zephyr/include/zephyr/linker/rel-sections.ld \
   zephyr/include/generated/snippets-rom-start.ld \
