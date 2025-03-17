@@ -16,13 +16,21 @@ void LED_driver_init(void) {
 
 void ALS_init(void) {
     write_to_ALS(0x00, 0b00000110); // Enable RGB IR sensing, activating the sensor
-    write_to_ALS(0x04, 0b01000000); // 16-bit ADC, 25ms sample rate interval
-    write_to_ALS(0x04, 0b00000001); // Set Gain to 3
-    write_to_ALS(0x04, 0b01000000); // 16-bit ADC, 25ms sample rate interval
+
+
+    write_to_ALS(0x04, 0b01010000); // 13-bit ADC, 25ms sample rate interval
+    // write_to_ALS(0x04, 0b01000000); // 16-bit ADC, 25ms sample rate interval
+    // write_to_ALS(0x04, 0b00000111); // 20-bit resolution, 2000 ms sample rate interval
+
+    // write_to_ALS(0x05, 0b00000000); // Set Gain to 1
+    // write_to_ALS(0x05, 0b00000001); // Set Gain to 3
+    // write_to_ALS(0x05, 0b00000010); // Set Gain to 6
+    // write_to_ALS(0x05, 0b00000011); // Set Gain to 9
+    write_to_ALS(0x05, 0b00000100); // Set Gain to 18
 }
 
 void ALS_collect_sample(void) {
-    while(read_from_ALS(0x07) & 0b00001000 == 0) k_usleep(10); // Wait for a sample to be collected
+    while((read_from_ALS(0x07) & 0b00001000) == 0) k_usleep(100); // Wait for a sample to be collected
     ALS_IR_READING      = read_from_ALS(0x0A) + (read_from_ALS(0x0B) << 8) + (read_from_ALS(0x0C) << 16);
     ALS_GREEN_READING   = read_from_ALS(0x0D) + (read_from_ALS(0x0E) << 8) + (read_from_ALS(0x0F) << 16);
     ALS_BLUE_READING    = read_from_ALS(0x10) + (read_from_ALS(0x11) << 8) + (read_from_ALS(0x12) << 16);
@@ -31,6 +39,14 @@ void ALS_collect_sample(void) {
 
 uint32_t ALS_get_recorded_green_value(void) {
     return ALS_GREEN_READING;
+}
+
+uint32_t ALS_get_recorded_red_value(void) {
+    return ALS_RED_READING;
+}
+
+uint32_t ALS_get_recorded_IR_value(void) {
+    return ALS_IR_READING;
 }
 
 void LED_driver_enable(void) {
@@ -119,6 +135,61 @@ uint8_t read_from_ALS(uint8_t reg) {
 	}
 
 	return data;
+}
+
+
+uint32_t HR_collect_red_sample(void) {
+    uint32_t rdg = 0;
+
+    // Illuminated
+    illuminate_red(RED_CURRENT);
+    ALS_collect_sample(); 
+    rdg += ALS_get_recorded_red_value();
+
+    // Baseline
+    turn_off_red();
+    ALS_collect_sample(); 
+    rdg -= ALS_get_recorded_red_value();
+
+    return rdg;
+}
+
+uint32_t HR_collect_IR_sample(void) {
+    uint32_t rdg = 0;
+
+    // Illuminated
+    illuminate_IR(IR_CURRENT);
+    ALS_collect_sample(); 
+    rdg += ALS_get_recorded_IR_value();
+
+    // Baseline
+    turn_off_IR();
+    ALS_collect_sample(); 
+    rdg -= ALS_get_recorded_IR_value();
+
+    return rdg;
+}
+
+uint32_t HR_collect_green_sample(void) {
+
+    // turn_off_red();
+    // turn_off_green();
+    // turn_off_blue();
+    // turn_off_IR();
+
+    uint32_t rdg = 0;
+
+    // Illuminated
+    illuminate_green(GREEN_CURRENT);
+    ALS_collect_sample(); 
+    rdg += ALS_get_recorded_green_value();
+
+    // Baseline
+    turn_off_green();
+    ALS_collect_sample(); 
+    rdg -= ALS_get_recorded_green_value();
+
+    return rdg;
 }
 
 

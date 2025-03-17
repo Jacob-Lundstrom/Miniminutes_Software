@@ -1,6 +1,8 @@
 #ifndef PWR_H
 #define PWR_H
 
+#include "main.h"
+
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -8,6 +10,7 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/adc.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/util.h>
@@ -33,7 +36,18 @@ static const struct adc_dt_spec adc_channels[] = {
 #define GREEN_MIN_PERCENT 40
 #define RED_MAX_PERCENT 60
 
+
+#define CHRG_STAT_NODE DT_ALIAS(chrgstat)
+static const struct gpio_dt_spec CHRG_STAT = GPIO_DT_SPEC_GET(CHRG_STAT_NODE, gpios);
+
+
 int ADC_init(void);
+
+int PWR_init(void);
+
+int PWR_disable_charge(void);
+int PWR_enable_charge(void);
+bool PWR_get_is_charging(void);
 
 uint32_t read_battery_voltage(void);
 uint8_t get_battery_percentage(uint32_t battery_mv);

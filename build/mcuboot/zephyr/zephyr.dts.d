@@ -24,5 +24,4 @@ empty_file.o: C:/ncs/v2.6.1/zephyr/misc/empty_file.c \
  C:/ncs/v2.6.1/zephyr/include/zephyr/dt-bindings/pwm/pwm.h \
  C:/ncs/v2.6.1/zephyr/dts/common/freq.h \
  C:/ncs/v2.6.1/zephyr/dts/arm/nordic/override.dtsi \
- C:/ouroboros-dev/boards/arm/microminutes_v1_1/microminutes_v1_1-pinctrl.dtsi \
  C:/ncs/v2.6.1/bootloader/mcuboot/boot/zephyr/app.overlay

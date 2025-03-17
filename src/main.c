@@ -44,21 +44,53 @@ static struct k_timer display_timeout;
 static struct k_timer clock_increment_timer;
 
 const k_tid_t thread_main_id;
-#define MAIN_STACKSIZE 512
+const k_tid_t battery_monitor_thread_id;
+#define MAIN_STACKSIZE 512*16
 #define PRIORITY 7
 
 static bool military_time = false;
 
 #define TIMER_DEVICE_NODE DT_NODELABEL(timer0)
 
-K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main_DEV, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-// 		PRIORITY, 0, 0);
+K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
 
+int battery_monitor_thread (void) {
+	while(1) {
+		k_msleep(1000);
+		if (is_charging) {
+			battery_mv = read_battery_voltage() - 250; // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
+		} else {
+			battery_mv = read_battery_voltage();
+		}
+		battery_p = get_battery_percentage(battery_mv);
+	}
+}
 
+K_THREAD_DEFINE(battery_monitor_thread_id, 512, battery_monitor_thread, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
 
+void stop(void) {
+	need_to_check_input = false;
+	show_time = false;
+	show_percent = false;
+	show_voltage = false;
+
+	display_timeout_isr(NULL);
+}
+
+void continue_check_input(void) {
+	need_to_check_input = true;
+	
+	show_time = false;
+	show_percent = false;
+	show_voltage = false;
+	
+	resume_main_thread();
+}
 
 void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
 	if (show_time || show_percent || show_voltage){
@@ -68,8 +100,25 @@ void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t
 	}
 }
 
+void PWR_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
+	// uint32_t start_time = k_uptime_get_32();
+    // while (k_uptime_get_32() - start_time < 3000) {
+    //     display_word("Chr9 ", 5, 1, 0);
+    // }
+
+	continue_check_input();
+
+	// is_charging = PWR_get_is_charging();
+	// if (is_charging) {
+	// 	continue_showing_time();
+	// 	return;
+	// }
+	// If this line is reached it means that something else happened, and we are not charging.
+}
+
 void display_timeout_isr(struct k_timer *dummy) {
 	if (!(always_on || (always_on_while_charging && is_charging))) {
+		need_to_check_input = false;
 		show_time = false;
 		show_percent = false;
 		show_voltage = false;
@@ -101,12 +150,13 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
-	ADC_init();
 	Display_init();
+	PWR_init();
+	ADC_init();
 	IMU_init();
 	configure_timers();
 	RTC_init();
-	HR_init();
+	// HR_init();
 }
 
 int thread_main_DEV(void) {
@@ -117,17 +167,27 @@ int thread_main_DEV(void) {
 	// This should be used as a development thread.
 	SYSTEM_init();
 	// HR_disable();
-	RTC_set_time(1, 5, 0);
+	RTC_set_time(0, 0, 0);
+
+	int64_t red_avg = 0;
+	int64_t green_avg = 0;
 
 	while(1) {
-		if (RTC_get_time() % 2) {
-			illuminate_green(10);
-			// turn_off_red();
-		} else {
-			// illuminate_red(10);
-			turn_off_green();
+		int N = 200;
+		uint16_t red_rdg[N];
+		uint16_t ir_rdg[N];
+		uint16_t green_rdg[N];
+		// for (int i = 0; i < N; i++) {
+		// 	red_rdg[i] = HR_collect_red_sample();
+		// }
+		for (int i = 0; i < N; i++) {
+			green_rdg[i] = HR_collect_green_sample();
 		}
-		k_msleep(100);
+		// for (int i = 0; i < N; i++) {
+		// 	red_rdg[i] = HR_collect_red_sample();
+		// 	ir_rdg[i] = HR_collect_IR_sample();
+		// }
+		k_msleep(1000);
 	}
 }
 
@@ -138,10 +198,7 @@ int thread_main(void) {
 	SYSTEM_init();
 
 	// while(1) {
-	// 	display_arb(2,1);
-	// 	k_msleep(1000);
-	// 	display_arb(1,1);
-	// 	k_msleep(1000);
+	// 	display_word("88888", 5, 1, 1);
 	// }
 
 	while (1) { // Start here at every on-condition
@@ -150,20 +207,23 @@ int thread_main(void) {
 
 		// Enter the display loop
 		while(true) {
-			
-			battery_mv = read_battery_voltage();
-			battery_p = get_battery_percentage(battery_mv);
 			if ((battery_mv < BATTERY_MIN_VOLTAGE_MV)){
 					// Make sure that we do nothing if the battery is too low.
 					break;
 			}
 
 			if (show_time) {
-				display_time_seconds_mil(SYSTEM_TIME_SECONDS, military_time);
+				display_time_seconds_mil(RTC_get_time(), military_time);
 			} else if (show_percent) {
 				display_percent(battery_p);
 			} else if (show_voltage) {
 				display_battery_voltage_mv(battery_mv);
+			} else if (need_to_check_input) {
+				is_charging = PWR_get_is_charging();
+				need_to_check_input = false;
+				if (is_charging) {
+					continue_showing_time();
+				}
 			} else {
 				break; // If this statement is reached, this means that the display timeout has executed.
 			}
@@ -179,6 +239,7 @@ int thread_main(void) {
 void resume_main_thread(void) {
 	k_thread_resume(thread_main_id);
 	if (!main_thread_enabled) {
+		k_timer_stop(&display_timeout);
 		k_timer_init(&display_timeout, display_timeout_isr, NULL);
 		k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
 	}
@@ -209,7 +270,10 @@ void continue_showing_battery_voltage(void){
 }
 
 void set_time(uint32_t time) {
-	SYSTEM_TIME_SECONDS = time;
+	uint8_t h = time / 3600; // Number of hours
+	uint8_t m = (time - 3600 * h) / 60; // Number of minutes
+	uint8_t s = (time - 3600 * h - 60 * m); 
+	RTC_set_time(h, m, s);
 
 	continue_showing_time();
 }
@@ -223,12 +287,15 @@ void set_military_time(bool status) {
 
 void simulate_IMU_interrupt(void) {
 	continue_showing_time();
+	// PWR_wakeup_isr(NULL, NULL, 0);
 }
 
 void set_always_on(bool state) {
 	always_on = state;
 	if (always_on) {
 		simulate_IMU_interrupt();
+	} else {
+		stop();
 	}
 }
 

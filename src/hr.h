@@ -12,6 +12,11 @@
 #define BLUE_CHANNEL 3
 #define IR_CHANNEL 4
 
+static uint8_t RED_CURRENT = 5; // mA
+static uint8_t GREEN_CURRENT = 3; // mA
+static uint8_t BLUE_CURRENT = 5; // mA
+static uint8_t IR_CURRENT = 5; // mA
+
 #define I2C0_LED_DRV_NODE DT_NODELABEL(is31fl3294)
 static const struct i2c_dt_spec led_drv_i2c = I2C_DT_SPEC_GET(I2C0_LED_DRV_NODE);
 
@@ -39,6 +44,10 @@ uint8_t read_from_LED_driver(uint8_t reg);
 
 uint8_t write_to_ALS(uint8_t reg, uint8_t val);
 uint8_t read_from_ALS(uint8_t reg);
+
+uint32_t HR_collect_red_sample(void);
+uint32_t HR_collect_IR_sample(void);
+uint32_t HR_collect_green_sample(void);
 
 void illuminate_channel(uint8_t channel_number, uint8_t current_mA);
 void turn_off_channel(uint8_t channel_number);

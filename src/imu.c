@@ -77,18 +77,11 @@ void enableInt1() {
 
 #ifdef __LIS2DUX12
 void enableInt1() {
-	writeToIMU(0x20, 0x60); // Enables low power mode 12-bit, 200 Hz ODR
-	
-	// This is an important one to lower the TDP
-	writeToIMU(0x25, 0x00); // Min digital LP cutoff frequency, Sets full scale value to 4g, enables LP filtering, disables low-noise config
-	
-	writeToIMU(0x30, 0x10); // Disables 4D/6D, zets x tap threshold to ~2g
-	writeToIMU(0x31, 0xB0); // Tap priority level Z -> X -> Y, y tap threshold (not used)
-	writeToIMU(0x32, 0xB0); // Enables tap on X, Z; sets z tap threshold to ~2g
-	writeToIMU(0x33, 0x7F); // Sets the maximum time gap between taps for double tap to ~1s
-							// maximum quiet time and maximum over-threshold event time
-	writeToIMU(0x34, 0x80); // Enables double tap wakeup
-	writeToIMU(0x23, 0x08); // Sets INT1 to trigger on Double Tap
-	writeToIMU(0x3F, 0x20); // Enables interrupts
+	writeToIMU(0x0C, 0b00111110); // Configures pulling resistors (Improves performance)
+	writeToIMU(0x10, 0b10010111); // Enables smart power, enables wake-up events on X, Y and Z
+	writeToIMU(0x12, 0b00000000); // Ensures that IMU is configured for Low-power mode
+	writeToIMU(0x14, 0b00111101); // Sets ODR to 25 Hz, BW to ODR/8, and FS = +- 4G
+
+	// writeToIMU(0x14, 0b00000000); // Power down
 }
 #endif

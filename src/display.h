@@ -40,6 +40,7 @@ static const struct gpio_dt_spec CC7 = GPIO_DT_SPEC_GET(CC7_NODE, gpios);
 
 int Display_init();
 void enableSegment(int segment);
+void disableSegment(int segment);
 void enableSegmentLow(int segment);
 void disableSegments();
 void displayNone();

@@ -12,6 +12,8 @@
 
 
 static uint32_t SYSTEM_TIME_SECONDS;
+
+static bool need_to_check_input;
 static bool show_time;
 static bool show_percent;
 static bool show_voltage;
@@ -37,6 +39,7 @@ void set_time(uint32_t time);
 void set_military_time(bool status);
 
 void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
+void PWR_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
 void display_timeout_isr(struct k_timer *dummy);
 
 

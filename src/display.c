@@ -142,6 +142,25 @@ void enableSegment(int segment) {
 	}
 }
 
+/**
+ * \brief			Controls the enabling of the specified display number
+ * \param			segment: Display number to enable
+ */
+void disableSegment(int segment) {
+	if (segment == 1) {
+		gpio_pin_configure_dt(&CA1, GPIO_INPUT);
+	} else if (segment == 2) {
+		gpio_pin_configure_dt(&CA2, GPIO_INPUT);
+	} else if (segment == 3) {
+		gpio_pin_configure_dt(&CA3, GPIO_INPUT);
+	} else if (segment == 4) {
+		gpio_pin_configure_dt(&CA4, GPIO_INPUT);
+	} else if (segment == 5) {
+		gpio_pin_configure_dt(&CA5, GPIO_INPUT);
+	} else {
+		disableSegments();
+	}
+}
 
 /**
  * \brief			Controls the enabling of the specified display number, active Low output. This should only be used to turn on indication LEDs.
@@ -326,35 +345,26 @@ void display_credits(void) {
  */
 void display_percent(int percent) {
 	int p = percent;
-
-	bool g = false;
-	bool r = false;
 	
-	if (p > 99) {
-		p = 99;
-	}
-	if (p < 0) {
-		p = 0;
-	}
+	bool g = (p >= GREEN_MIN_PERCENT);
+	bool r = (p <= RED_MAX_PERCENT);
 
-	g = (p >= GREEN_MIN_PERCENT);
-	r = (p <= RED_MAX_PERCENT);
+	if (p > 99) {
+		display_arb_all(num_to_segment(1), num_to_segment(0), num_to_segment(0), 0b00011010, 0b01010010, 1, 0);
+		return;
+	}
+	
+	if (p < 0) {
+		display_arb_all(num_to_segment(0), 0x00, 0x00, 0b00011010, 0b01010010, 0, 1);
+		return;
+	}
 
 	int dig1 = p / 10;
 	int dig2 = p - dig1 * 10;
-	// dig2 is too noisy. Round to the nearest 5%.
-	if (dig2 > 7) {
-		dig1++;
-		dig2 = 0;
-	} else if (dig2 < 3) {
-		dig2 = 0;
-	} else {
-		dig2 = 5;
-	}
-
-	if (dig1 >= 10) {
-		dig1 = 9;
-		dig2 = 9;
+	
+	if (p < 10) {
+		display_arb_all(num_to_segment(dig2), 0x00, 0x00, 0b00011010, 0b01010010, g, r);
+		return;
 	}
 
 	display_arb_all(num_to_segment(dig1), num_to_segment(dig2), 0x00 , 0b00011010, 0b01010010, g, r);
@@ -507,7 +517,6 @@ uint8_t char_to_segment(uint8_t character) {
  * \param			data: Data corresponding to the configuration to be displayed. Bits 7-1 correspond to segments G-A, respectively. Bit 0 is used to enable an indication LED, if it is associated with the display segment. Otherwise, bit 0 does nothing.
  */
 void display_arb(int segment, uint8_t data) {
-	displayNone();
 
 	uint8_t out_states = 0xFF - data;
 	gpio_pin_set_dt(&CC7, ((out_states >> 7) & 1));
@@ -534,6 +543,7 @@ void display_arb(int segment, uint8_t data) {
 
 	enableSegment(segment);
 	k_usleep(SEGMENT_MIN_ON_TIME_US);
+	disableSegment(segment);
 }
 
 
