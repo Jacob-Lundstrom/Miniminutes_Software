@@ -884,7 +884,6 @@
   compatible="i2c-device";
   label="BQ25188";
   reg = <0x6A>;
-
  };
 
  apds_9253_001: apds_9253_001@52{

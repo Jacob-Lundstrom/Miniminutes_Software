@@ -10,6 +10,11 @@
 #include <zephyr/drivers/counter.h>
 #include <zephyr/sys/printk.h>
 
+#define DISPLAY_PERCENT_WHILE_CHARGING 1
+#define DISPLAY_VOLTAGE_WHILE_CHARGING 2
+#define DISPLAY_TIME_WHILE_CHARGING 3
+// Add more display charging modes here
+
 
 static uint32_t SYSTEM_TIME_SECONDS;
 
@@ -20,7 +25,7 @@ static bool show_voltage;
 static bool always_on;
 static bool always_on_while_charging;
 static bool is_charging;
-static bool main_thread_enabled;
+static bool display_thread_enabled;
 
 
 static int battery_mv;
@@ -29,8 +34,10 @@ static int reset_ble_required;
 
 int thread_main_DEV(void);
 int thread_main(void);
+int battery_monitor_thread(void);
+int display_thread(void);
 
-void resume_main_thread(void);
+void resume_display(void);
 void continue_showing_time(void);
 void continue_showing_battery_percent(void);
 void continue_showing_battery_voltage(void);

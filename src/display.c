@@ -192,12 +192,6 @@ void disableSegments() {
 	gpio_pin_configure_dt(&CA3, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA4, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA5, GPIO_INPUT);
-
-	// gpio_pin_set_dt(&CA1, 0);
-	// gpio_pin_set_dt(&CA2, 0);
-	// gpio_pin_set_dt(&CA3, 0);
-	// gpio_pin_set_dt(&CA4, 0);
-	// gpio_pin_set_dt(&CA5, 0);
 }
 
 
@@ -233,7 +227,7 @@ void displayNumberOnSegment(uint8_t num, int segment) {
  * \brief			Displays a colon on display number 3. This is used in displaying the time.
  */
 void displayColon(){
-	display_arb(3, 0b10010000);
+	display_arb(3, char_to_segment(':'));
 }
 
 
@@ -276,7 +270,7 @@ void display_time_seconds(int time_seconds) {
  * \param			time_seconds: The time in seconds since midnight.
  * \param			military_time: Controls whether the shown time is in 24-hour time (`true`) or 12-hour time (`false`)
  */
-void display_time_seconds_mil(int time_seconds, bool military_time) {
+void display_time_seconds_mil(int time_seconds, bool military_time, bool show_colon) {
 	
 	int hr = time_seconds / (60*60) ;
 	int min = time_seconds / (60) - 60 * hr;
@@ -300,7 +294,7 @@ void display_time_seconds_mil(int time_seconds, bool military_time) {
 			dig1 = -1; // Don't show the highest hour time if using non-24 hr time.
 		}
 	}
-	displayTime(dig1, dig2, true, dig3, dig4, false, false);
+	displayTime(dig1, dig2, show_colon, dig3, dig4, false, false);
 }
 
 

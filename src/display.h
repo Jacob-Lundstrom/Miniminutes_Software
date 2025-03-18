@@ -48,7 +48,7 @@ void displayNumberOnSegment(uint8_t num, int segment);
 void displayColon();
 void displayTime(int num1, int num2, bool colon, int num3, int num4, bool green_ind, bool red_ind);
 void display_time_seconds(int current_time_seconds);
-void display_time_seconds_mil(int current_time_seconds, bool military_time);
+void display_time_seconds_mil(int current_time_seconds, bool military_time, bool show_colon);
 void display_battery_voltage_mv(int mv);
 void display_error(uint8_t error_number);
 void display_credits(void);
