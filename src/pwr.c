@@ -1,9 +1,5 @@
 #include "pwr.h"
 
-
-#define I2C0_PWR_NODE DT_NODELABEL(bq25188)
-static const struct i2c_dt_spec pwr_i2c = I2C_DT_SPEC_GET(I2C0_PWR_NODE);
-
 static struct gpio_callback chrg_stat_pin_cb_data;
 
 uint8_t write_to_pwr(uint8_t reg, uint8_t val) {
@@ -65,6 +61,7 @@ int ADC_init(void) {
 
 
 int PWR_init(void) {
+
 	int ret;
 
 	if (!gpio_is_ready_dt(&CHRG_STAT)) {
@@ -72,6 +69,10 @@ int PWR_init(void) {
 	}
 
 	ret = gpio_pin_configure_dt(&CHRG_STAT, GPIO_PULL_UP);
+	if (ret < 0) {
+		return 0;
+	}
+	
 	ret = gpio_pin_configure_dt(&CHRG_STAT, GPIO_INPUT);
 	if (ret < 0) {
 		return 0;
@@ -110,33 +111,31 @@ int PWR_init(void) {
 	return 0;
 }
 
-int PWR_disable_charge(){
-	// Will return -1 if we cannot safely disable charging
-	// This is actually to disable the power path management
-
-
-	write_to_pwr(0x0A, 0b00000111); // V_SYS = V_BATT
+int PWR_disconnect_from_charger(){
+	write_to_pwr(0x0A, (read_from_pwr(0x0A) & !(0b11 << 2)) | (0b1 << 2)); // V_SYS = V_BATT
 	return 0;
 }
 
-int PWR_enable_charge() {
-
-	
-	write_to_pwr(0x0A, 0b00000011); // V_SYS = V_INDPM
+int PWR_reconnect_to_charger() {
+	write_to_pwr(0x0A, (read_from_pwr(0x0A) & !(0b11 << 2))); // V_SYS = V_INDPM
 	return 0;
 }
 
 
-bool PWR_get_is_charging() {
-	return (read_from_pwr(0x00) & (0b01100000)); //(00 -> not charging, 01 -> CC, 10 -> CV, 11 -> Charge Done)
+bool PWR_get_is_on_charger() {
+	return (read_from_pwr(0x00 * 0b1)); // VIN Power good
+}
+
+bool PWR_get_charge_status() {
+	return ((read_from_pwr(0x00) & (0b01100000)) >> 5); //(00 -> not charging, 01 -> CC, 10 -> CV, 11 -> Charge Done)
 }
 
 uint32_t read_battery_voltage(void) {
 	uint32_t avg = 0;
-	int rdgs = 1;
+	int rdgs = 100;
 
 	int err = 0;
-	// err = PWR_disable_charge();
+	// err = PWR_disconnect_from_charger();
 	if (err < 0) {
 		return BATTERY_MIN_VOLTAGE_MV;
 	}

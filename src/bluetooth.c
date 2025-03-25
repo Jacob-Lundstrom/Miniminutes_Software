@@ -420,10 +420,9 @@ void process_input(struct uart_data_t *input) {
 		if (input->data[3] == '1') req = true;
 		set_always_on(req);
 		BLE_RECIEVED_FLAG = true;
-	} else if ((input->data[0] == 'A') && (input->data[1] == 'O') && (input->data[2] == 'W') && (input->data[3] == 'C') && (input->data[4] == '=') && ((input->data[5] == '0') || (input->data[5] == '1'))) {
-		bool req = false;
-		if (input->data[5] == '1') req = true;
-		set_always_on_while_charging(req);
+	} else if ((input->data[0] == 'D') && (input->data[1] == 'M') && (input->data[2] == 'W') && (input->data[3] == 'C') && (input->data[4] == '=') && ((input->data[5] >= '0') && (input->data[5] <= '9'))) {
+		uint8_t req = (input->data[5] - '0');
+		set_display_mode_while_charging(req);
 		BLE_RECIEVED_FLAG = true;
 	}
 }

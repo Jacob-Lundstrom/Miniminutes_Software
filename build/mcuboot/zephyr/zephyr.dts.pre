@@ -864,20 +864,24 @@
 
  pinctrl-0 = <&i2c0_default>;
  pinctrl-names = "default";
- clock-frequency = <400000>;
-# 183 "C:/ouroboros-dev/boards/arm/microminutes_v1_1/microminutes_v1_1.dts"
- lis2dux12: lis2dux12@18{
+ clock-frequency = <100000>;
+
+
+
+
+
+
+
+ lis2dux12: lis2dux12@19{
   compatible="i2c-device";
   label="LIS2DUX12";
-  reg = <0x18>;
-
+  reg = <0x19>;
  };
 
  rv_8263_c8: rv_8263_c8@51{
   compatible="i2c-device";
   label="RV-8263-C8";
   reg = <0x51>;
-
  };
 
  bq25188: bq25188@6A{
@@ -890,16 +894,13 @@
   compatible="i2c-device";
   label="APDS-9253-001";
   reg = <0x52>;
-
  };
 
  is31fl3294: is31fl3294@74{
   compatible="i2c-device";
   label="IS31FL3294";
   reg = <0x74>;
-
  };
-
 
 
 

@@ -20,7 +20,7 @@
 #define CC6_NODE DT_ALIAS(cc6)
 #define CC7_NODE DT_ALIAS(cc7)
 
-#define SEGMENT_MIN_ON_TIME_US 100
+#define SEGMENT_MIN_ON_TIME_US 300
 #define SEGMENT_MIN_OFF_TIME_US 100
 
 static const struct gpio_dt_spec CA1 = GPIO_DT_SPEC_GET(CA1_NODE, gpios);

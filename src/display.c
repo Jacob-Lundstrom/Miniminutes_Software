@@ -339,9 +339,11 @@ void display_credits(void) {
  */
 void display_percent(int percent) {
 	int p = percent;
-	
+
+	uint16_t T_flash_ms = 250; // ms
 	bool g = (p >= GREEN_MIN_PERCENT);
-	bool r = (p <= RED_MAX_PERCENT);
+	bool r = (p <= RED_MAX_PERCENT) - (!is_charging) * (p <= RED_FLASHING_MAX_PERCENT) * ((k_uptime_get() % (T_flash_ms)) / (T_flash_ms / 2));
+
 
 	if (p > 99) {
 		display_arb_all(num_to_segment(1), num_to_segment(0), num_to_segment(0), 0b00011010, 0b01010010, 1, 0);
@@ -548,10 +550,16 @@ void display_arb(int segment, uint8_t data) {
  * \param[in]       red_ind: Controls if the red indication LED will be illuminated
  */
 void display_arb_all(uint8_t s1, uint8_t s2, uint8_t s3, uint8_t s4, uint8_t s5, bool green_ind, bool red_ind){
-	display_arb(1, s1 + red_ind);
-	display_arb(2, s2 + green_ind);
+	display_arb(1, s1);
+	display_arb(1, red_ind);
+	
+	display_arb(2, s2);
+	display_arb(2, green_ind);
+	
 	display_arb(3, s3);
+	
 	display_arb(4, s4);
+	
 	display_arb(5, s5);
 }
 

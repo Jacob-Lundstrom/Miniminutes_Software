@@ -10,20 +10,20 @@
 #include <zephyr/drivers/counter.h>
 #include <zephyr/sys/printk.h>
 
+#define DISPLAY_NOTHING_WHILE_CHARGING 0
 #define DISPLAY_PERCENT_WHILE_CHARGING 1
 #define DISPLAY_VOLTAGE_WHILE_CHARGING 2
 #define DISPLAY_TIME_WHILE_CHARGING 3
+#define DISPLAY_TIME_AND_PERCENT_WHILE_CHARGING 4
 // Add more display charging modes here
-
-
-static uint32_t SYSTEM_TIME_SECONDS;
 
 static bool need_to_check_input;
 static bool show_time;
 static bool show_percent;
 static bool show_voltage;
 static bool always_on;
-static bool always_on_while_charging;
+// static bool always_on_while_charging; // Deprecated
+static uint8_t charging_display_mode;
 static bool is_charging;
 static bool display_thread_enabled;
 
@@ -32,10 +32,10 @@ static int battery_mv;
 static int battery_p;
 static int reset_ble_required;
 
-int thread_main_DEV(void);
-int thread_main(void);
-int battery_monitor_thread(void);
-int display_thread(void);
+int THREAD_main_DEV(void);
+int THREAD_main(void);
+int THREAD_battery_monitor(void);
+int THREAD_display(void);
 
 void resume_display(void);
 void continue_showing_time(void);
@@ -57,4 +57,4 @@ void reset_BLE(void);
 void start_BLE_thread(void);
 
 void set_always_on(bool state);
-void set_always_on_while_charging(bool state);
+void set_display_mode_while_charging(uint8_t state);

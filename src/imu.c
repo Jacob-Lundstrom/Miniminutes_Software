@@ -40,14 +40,21 @@ uint8_t readFromIMU(uint8_t reg) {
 
 void IMU_init(void) {
 
-	enableInt1();
-
-
 	int ret;
 
 	if (!gpio_is_ready_dt(&INT1)) {
 		return 0;
 	}
+
+	// ret = gpio_pin_configure_dt(&INT1, GPIO_PULL_UP);
+	// if (ret < 0) {
+	// 	return 0;
+	// }
+	
+	// ret = gpio_pin_configure_dt(&INT1, GPIO_INPUT);
+	// if (ret < 0) {
+	// 	return 0;
+	// }
 	
 	ret = gpio_pin_interrupt_configure_dt(&INT1,GPIO_INT_EDGE_TO_ACTIVE);
 	if (ret < 0) {
@@ -55,6 +62,9 @@ void IMU_init(void) {
 	}
 	gpio_init_callback(&pin_cb_data, IMU_wakeup_isr, BIT(INT1.pin));
 	gpio_add_callback(INT1.port, &pin_cb_data);
+
+	
+	enableInt1();
 }
 
 #ifdef __LIS2DW12
@@ -77,11 +87,78 @@ void enableInt1() {
 
 #ifdef __LIS2DUX12
 void enableInt1() {
+#if 0
+	writeToIMU(0x3E, 1); // Enables soft-power down
+	k_msleep(30);
+
+	writeToIMU(0x14, 0b00000000);
+
+	writeToIMU(0x6F, 0b11000101); // Enables tap detection on Z, and sets inverted peak time to 5 samples
+
 	writeToIMU(0x0C, 0b00111110); // Configures pulling resistors (Improves performance)
 	writeToIMU(0x10, 0b10010111); // Enables smart power, enables wake-up events on X, Y and Z
 	writeToIMU(0x12, 0b00000000); // Ensures that IMU is configured for Low-power mode
-	writeToIMU(0x14, 0b00111101); // Sets ODR to 25 Hz, BW to ODR/8, and FS = +- 4G
 
+	writeToIMU(0x17, 0b00000001); // Enables interrupts
+
+	writeToIMU(0x1C, 0b00000100); // Enables sleep and sets wakeup threshold
+
+	writeToIMU(0x1F, 0b00001000); // Enables routing all tap interrupts to INT1
+
+	writeToIMU(0x70, 0b01111111); // [7:4] Sets threshold for stationary condition [3:0] sets number of samples in stationary condition
+	writeToIMU(0x71, 0b11111111); // [7:6] Sets high count for number of samples in stationary condition, [5:0] sets number of samples to wait for shock to stop
+	writeToIMU(0x72, 0b01110010); // [7:4] Sets threshold for stationary condition after shock [3:0] sets max number of samples between taps to 2*32 = 64 samples
+	writeToIMU(0x73, 0b00000111); // [4:0] Sets peak threshold to ~2g
+	writeToIMU(0x74, 0b11100000); // Enable double tap detection
+	writeToIMU(0x75, 0b00001111); // Configures number of still samples before a shock
+
+	// This might have to be done last?
+	writeToIMU(0x14, 0b00110101); // Sets ODR to 25 Hz ULP, BW to 12.5 Hz, and FS = +- 4G
+	
 	// writeToIMU(0x14, 0b00000000); // Power down
+#endif
+
+#if 1
+
+	writeToIMU(0x3E, 1); // Exits deep-power down
+	k_msleep(25);
+
+	uint8_t who_am_i = readFromIMU(0x0f);
+
+	if (who_am_i != 0b01000111) {
+		while (1) k_msleep(10);
+	}
+
+	// Initiate a software reset
+	writeToIMU(0x10, 0b00100000);
+	while (readFromIMU(0x10) & 0b00100000) k_msleep(10);
+	
+	writeToIMU(0x13, 0b00100000); // CTRL4
+	writeToIMU(0x10, 0b00011111); // CTRL1
+	
+	// writeToIMU(0x17, 0b00000001); // Enables interrupts, sets interrupt mode to level
+	// writeToIMU(0x10, 0b00010111); // Enables wake-up events on X, Y and Z
+	
+	writeToIMU(0x6F, 0b11000101); // axis, inverted_peak_time
+	writeToIMU(0x70, 0b00101000); // Sets pre_still_ths and the post_still_time
+	writeToIMU(0x71, 0b00001000); // shock_wait_time
+	writeToIMU(0x72, 0b10000100); // post_still_ths, latency	
+	writeToIMU(0x73, 0b10001000); // Wait_end_latency, peak_ths
+	writeToIMU(0x74, 0b11100000); // single_tap_on, double_tap_on, triple_tap_on, rebound
+	writeToIMU(0x75, 0b00001010); // pre_still_start, pre_still_n
+
+	writeToIMU(0x10, readFromIMU(0x10) | 0b00010000);
+	writeToIMU(0x11, readFromIMU(0x11));
+
+	writeToIMU(0x1F, readFromIMU(0x1F) | 0b00001000); // Enable tap interrupts on INT1
+
+	writeToIMU(0x17, 0b00000001);
+
+	// writeToIMU(0x0C, 0b00111110); // Configures pulling resistors, sets interrupt level, sets open-drain on INT1
+	writeToIMU(0x14, 0b10100010); // ODR 400 Hz, 8G FS
+	writeToIMU(0x12, 0b00000000); // HP disabled
+
+	readFromIMU(0x24); // Ensure that we read and clear all interrupt flags
+#endif
 }
 #endif

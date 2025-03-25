@@ -35,19 +35,25 @@ static const struct adc_dt_spec adc_channels[] = {
 
 #define GREEN_MIN_PERCENT 40
 #define RED_MAX_PERCENT 60
+#define RED_FLASHING_MAX_PERCENT 20
 
 
 #define CHRG_STAT_NODE DT_ALIAS(chrgstat)
 static const struct gpio_dt_spec CHRG_STAT = GPIO_DT_SPEC_GET(CHRG_STAT_NODE, gpios);
+
+#define I2C0_PWR_NODE DT_NODELABEL(bq25188)
+static const struct i2c_dt_spec pwr_i2c = I2C_DT_SPEC_GET(I2C0_PWR_NODE);
+
 
 
 int ADC_init(void);
 
 int PWR_init(void);
 
-int PWR_disable_charge(void);
-int PWR_enable_charge(void);
-bool PWR_get_is_charging(void);
+int PWR_disconnect_from_charger(void);
+int PWR_reconnect_to_charger(void);
+bool PWR_get_is_on_charger(void);
+bool PWR_get_charge_status(void);
 
 uint32_t read_battery_voltage(void);
 uint8_t get_battery_percentage(uint32_t battery_mv);

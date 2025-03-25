@@ -51,33 +51,35 @@ const k_tid_t battery_monitor_thread_id;
 
 static bool military_time = false;
 
-#define TIMER_DEVICE_NODE DT_NODELABEL(timer0)
-
-K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, thread_main, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(battery_monitor_thread_id, 512, battery_monitor_thread, NULL, NULL, NULL,
+K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(display_thread_id, 512, display_thread, NULL, NULL, NULL,
+K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
 
-int battery_monitor_thread (void) {
+int THREAD_battery_monitor (void) {
 	while(1) {
-		k_msleep(1000);
+		k_msleep(900);
 		if (is_charging) {
-			battery_mv = read_battery_voltage() - 250; // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
+			PWR_disconnect_from_charger();
+			k_msleep(100); // Wait for the voltage on the cap to stabilize
+			battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
+			PWR_reconnect_to_charger();
 		} else {
+			k_msleep(100);
 			battery_mv = read_battery_voltage();
 		}
 		battery_p = get_battery_percentage(battery_mv);
 	}
 }
 	
-int display_thread (void) {
+int THREAD_display (void) {
 	extern bool BLE_RECIEVED_FLAG;
 
 	while(true) {
@@ -99,7 +101,7 @@ int display_thread (void) {
 	}
 }
 
-void stop(void) {
+void stop_display(void) {
 	need_to_check_input = false;
 	show_time = false;
 	show_percent = false;
@@ -131,8 +133,8 @@ void PWR_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t
 }
 
 void display_timeout_isr(struct k_timer *dummy) {
-	if (!(always_on || (always_on_while_charging && is_charging))) {
-		need_to_check_input = false;
+	if (!(always_on || (charging_display_mode && is_charging))) {
+		// need_to_check_input = false;
 		show_time = false;
 		show_percent = false;
 		show_voltage = false;
@@ -140,27 +142,27 @@ void display_timeout_isr(struct k_timer *dummy) {
 	k_timer_stop(&display_timeout);
 }
 
-void time_increment_isr(struct k_timer *dummy) {
-	SYSTEM_TIME_SECONDS++;
-	if (SYSTEM_TIME_SECONDS >= 24 * 60 * 60) {
-		// 1 full day has passed, reset the counter
-		SYSTEM_TIME_SECONDS -= 24 * 60 * 60;
-	}
-	return;
-}
-
 void configure_timers(void) {	
 	k_timer_init(&display_timeout, display_timeout_isr, NULL );
 	k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
+}
 
-	SYSTEM_TIME_SECONDS = 0;
-	k_timer_init(&clock_increment_timer, time_increment_isr, NULL);
-	k_timer_start(&clock_increment_timer, K_SECONDS(1), K_SECONDS(1));
+void display_while_charging(void) {
+	if (is_charging) {
+		if (charging_display_mode == DISPLAY_NOTHING_WHILE_CHARGING) stop_display();
+		if (charging_display_mode == DISPLAY_PERCENT_WHILE_CHARGING) continue_showing_battery_percent();
+		if (charging_display_mode == DISPLAY_VOLTAGE_WHILE_CHARGING) continue_showing_battery_voltage();
+		if (charging_display_mode == DISPLAY_TIME_WHILE_CHARGING) continue_showing_time();
+		if (charging_display_mode == DISPLAY_TIME_AND_PERCENT_WHILE_CHARGING) return; // unimplemented at the moment
+	}
 }
 
 void SYSTEM_init(void) {
 
-	show_time = true;
+	need_to_check_input = true; // On startup, see if the device is on the charger
+
+	// Assume that it is not charging
+	show_time = false;
 	show_percent = false;
 	show_voltage = false;
 
@@ -168,12 +170,31 @@ void SYSTEM_init(void) {
 	PWR_init();
 	ADC_init();
 	IMU_init();
-	configure_timers();
 	RTC_init();
 	// HR_init(); // Only for MicroFitness
 }
 
-int thread_main_DEV(void) {
+#include "display.h"
+int THREAD_main_DEV(void) {
+	SYSTEM_init();
+
+	gpio_pin_set_dt(&CC7, 0);
+	gpio_pin_set_dt(&CC6, 0);
+	gpio_pin_set_dt(&CC5, 0);
+	gpio_pin_set_dt(&CC4, 0);
+	gpio_pin_set_dt(&CC3, 0);
+	gpio_pin_set_dt(&CC2, 0);
+	gpio_pin_set_dt(&CC1, 0);
+
+	while(1) {
+
+		enableSegment(1);
+		k_msleep(500);
+
+		disableSegment(1);		
+		k_msleep(500);
+	}
+
 	// TODO:
 	// Test all the functions that I wrote for the RTC
 	// Write a processing algorithm that measures heart rate
@@ -205,21 +226,32 @@ int thread_main_DEV(void) {
 	}
 }
 
-int thread_main(void) {
+int THREAD_main(void) {
+	// TODO
+	// - Check all modes for full functionality
+	// - Implement OTA updates
+	// - Add Step counting
+	// - Add timer setting functionality (alarms)
+	// - Suspension of BLE thread when powered down
+	// - Further improvements of power consumptino when powered down
+	// - Perform burn-out tests on eahc color of LED
+	// - Finish next board revision, place order
+	// 		- Add vibration functionality, fix IMU problem
 
-	SYSTEM_init();
+	SYSTEM_init();	
 
-	// while(1) {
-	// 	display_word("88888", 5, 1, 1);
-	// }
+	// This is required for the display to begin showing info immediately after startup
+	k_msleep(1000); // wait for the other threads to finish initializing before starting
+
+	is_charging = PWR_get_is_on_charger();
+	// set_display_mode_while_charging(DISPLAY_PERCENT_WHILE_CHARGING);
+	set_display_mode_while_charging(DISPLAY_VOLTAGE_WHILE_CHARGING);
 
 	while(1) {
 		if (need_to_check_input) {
-			is_charging = PWR_get_is_charging();
+			is_charging = PWR_get_is_on_charger();
 			need_to_check_input = false;
-			if (is_charging) {
-				continue_showing_battery_percent();
-			}
+			display_while_charging();
 		} else {
 			k_thread_suspend(thread_main_id);
 		}
@@ -288,17 +320,18 @@ void simulate_IMU_interrupt(void) {
 }
 
 void set_always_on(bool state) {
+	// This function should be used mostly for development only.
 	always_on = state;
 	if (always_on) {
 		simulate_IMU_interrupt();
 	} else {
-		stop();
+		stop_display();
 	}
 }
 
-void set_always_on_while_charging(bool state) {
-	always_on_while_charging = state;
+void set_display_mode_while_charging(uint8_t state) {
+	charging_display_mode = state;
 	if (is_charging) {
-		continue_showing_battery_percent();
+		display_while_charging();
 	}
 }
