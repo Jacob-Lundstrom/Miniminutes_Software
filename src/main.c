@@ -40,6 +40,11 @@ LOG_MODULE_REGISTER(smp_sample);
 #define ALARM_CHANNEL_ID 0
 #define TIMER DT_NODELABEL(rtc0)
 
+
+#define MOTOR_NODE DT_ALIAS(motorenable)
+static const struct gpio_dt_spec motor = GPIO_DT_SPEC_GET(MOTOR_NODE, gpios);
+
+
 static struct k_timer display_timeout;
 static struct k_timer clock_increment_timer;
 
@@ -57,8 +62,8 @@ K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
 K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+// K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
+// 		PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
@@ -78,9 +83,13 @@ int THREAD_battery_monitor (void) {
 		battery_p = get_battery_percentage(battery_mv);
 	}
 }
-	
+
+// int pin_level = 1;
 int THREAD_display (void) {
 	extern bool BLE_RECIEVED_FLAG;
+
+	// while (1)
+	// 	display_arb_all(0x00, 0x00, 0x00, 0x00, num_to_segment(pin_level), 0, 0);
 
 	while(true) {
 		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV)){
@@ -167,16 +176,25 @@ void SYSTEM_init(void) {
 	show_voltage = false;
 
 	Display_init(); // Only for MicroMinutes
+	Motor_init(); // Only for MicroMinutes
+
+	// HR_init(); // Only for MicroFitness
+	
 	PWR_init();
 	ADC_init();
 	IMU_init();
 	RTC_init();
-	// HR_init(); // Only for MicroFitness
+
 }
 
 #include "display.h"
 int THREAD_main_DEV(void) {
 	SYSTEM_init();
+
+	enableSegment(1);
+	// enableSegment(1);
+	disableSegment(2);
+	// enableSegmentLow(1);
 
 	gpio_pin_set_dt(&CC7, 0);
 	gpio_pin_set_dt(&CC6, 0);
@@ -186,13 +204,18 @@ int THREAD_main_DEV(void) {
 	gpio_pin_set_dt(&CC2, 0);
 	gpio_pin_set_dt(&CC1, 0);
 
+	k_thread_suspend(thread_main_id);
 	while(1) {
 
-		enableSegment(1);
-		k_msleep(500);
+		// display_word(" 8:00", 5, 1, 1);
+		k_msleep(1000);
 
-		disableSegment(1);		
-		k_msleep(500);
+		// enableSegment(1);
+
+		// k_msleep(500);
+
+		// disableSegment(1);		
+		// k_msleep(500);
 	}
 
 	// TODO:
@@ -238,7 +261,14 @@ int THREAD_main(void) {
 	// - Finish next board revision, place order
 	// 		- Add vibration functionality, fix IMU problem
 
-	SYSTEM_init();	
+	SYSTEM_init();		
+
+	while(1) {
+		Motor_on();
+		k_msleep(1000);
+		Motor_off();
+		k_msleep(1000);
+	}
 
 	// This is required for the display to begin showing info immediately after startup
 	k_msleep(1000); // wait for the other threads to finish initializing before starting
@@ -246,12 +276,16 @@ int THREAD_main(void) {
 	is_charging = PWR_get_is_on_charger();
 	// set_display_mode_while_charging(DISPLAY_PERCENT_WHILE_CHARGING);
 	set_display_mode_while_charging(DISPLAY_VOLTAGE_WHILE_CHARGING);
+	
 
 	while(1) {
 		if (need_to_check_input) {
 			is_charging = PWR_get_is_on_charger();
+			bool rtc_alarm = RTC_check_alarm();
 			need_to_check_input = false;
-			display_while_charging();
+			// if (rtc_alarm); // do something
+			if (is_charging) display_while_charging();
+			
 		} else {
 			k_thread_suspend(thread_main_id);
 		}
@@ -334,4 +368,26 @@ void set_display_mode_while_charging(uint8_t state) {
 	if (is_charging) {
 		display_while_charging();
 	}
+}
+
+
+void Motor_init(void) {
+	if (!gpio_is_ready_dt(&motor)) {
+		return 0;
+	}
+
+	int ret = gpio_pin_configure_dt(&motor, GPIO_OUTPUT_ACTIVE);
+	if (ret < 0) {
+		return 0;
+	}
+
+	Motor_off();
+}
+
+void Motor_on(void) {
+	gpio_pin_set_dt(&motor, 1);
+}
+
+void Motor_off(void) {
+	gpio_pin_set_dt(&motor, 0);
 }

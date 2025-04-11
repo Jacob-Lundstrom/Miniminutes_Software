@@ -726,8 +726,9 @@
   cc7 = &cathode7;
 
   int1 = &int1;
-  chrgstat = &chrgstat;
+  sysint = &chrg_rtc_int;
 
+  motorenable = &motorenable;
 
   watchdog0 = &wdt0;
  };
@@ -795,6 +796,11 @@
    label = "Cathode_7";
   };
 
+
+  motorenable: motorenable {
+   gpios = <&gpio0 18 0>;
+   label = "MotorEnable";
+  };
  };
 
  buttons {
@@ -804,9 +810,9 @@
    label = "Int1";
   };
 
-  chrgstat: chrgstat {
+  chrg_rtc_int: chrg_rtc_int {
    gpios = <&gpio0 5 ((1 << 0) | (1 << 4))>;
-   label = "chrgStat";
+   label = "Chrg_RTC_Int";
   };
  };
 

@@ -58,3 +58,8 @@ void start_BLE_thread(void);
 
 void set_always_on(bool state);
 void set_display_mode_while_charging(uint8_t state);
+
+
+void Motor_init(void);
+void Motor_on(void);
+void Motor_off(void);

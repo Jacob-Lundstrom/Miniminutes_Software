@@ -4642,7 +4642,7 @@ initlevel       0x0000000000008610       0x50
  .z_init_PRE_KERNEL_10_0_
                 0x0000000000008610        0x8 zephyr/soc/soc/arm/nordic_nrf/libsoc__arm__nordic_nrf.a(soc.c.obj)
  *(SORT_BY_NAME(SORT_BY_ALIGNMENT(.z_init_PRE_KERNEL_1??_*)))
- .z_init_PRE_KERNEL_130_00037_
+ .z_init_PRE_KERNEL_130_00038_
                 0x0000000000008618        0x8 zephyr/drivers/clock_control/libdrivers__clock_control.a(clock_control_nrf.c.obj)
  .z_init_PRE_KERNEL_140_00011_
                 0x0000000000008620        0x8 zephyr/drivers/gpio/libdrivers__gpio.a(gpio_nrfx.c.obj)
@@ -4662,9 +4662,9 @@ initlevel       0x0000000000008610       0x50
                 0x0000000000008640        0x8 zephyr/kernel/libkernel.a(system_work_q.c.obj)
  .z_init_POST_KERNEL50_00008_
                 0x0000000000008648        0x8 zephyr/drivers/adc/libdrivers__adc.a(adc_nrfx_saadc.c.obj)
- .z_init_POST_KERNEL50_00079_
+ .z_init_POST_KERNEL50_00080_
                 0x0000000000008650        0x8 zephyr/drivers/flash/libdrivers__flash.a(soc_flash_nrf.c.obj)
- .z_init_POST_KERNEL90_00067_
+ .z_init_POST_KERNEL90_00068_
                 0x0000000000008658        0x8 zephyr/drivers/sensor/nrf5/libdrivers__sensor__nrf5.a(temp_nrf5.c.obj)
                 0x0000000000008660                __init_APPLICATION_start = .
  *(SORT_BY_NAME(SORT_BY_ALIGNMENT(.z_init_APPLICATION?_*)))
@@ -4680,7 +4680,7 @@ device_area     0x0000000000008660       0x78
  *(SORT_BY_NAME(SORT_BY_ALIGNMENT(._device.static.*_??_*)))
  ._device.static.1_30_
                 0x0000000000008660       0x14 zephyr/drivers/clock_control/libdrivers__clock_control.a(clock_control_nrf.c.obj)
-                0x0000000000008660                __device_dts_ord_37
+                0x0000000000008660                __device_dts_ord_38
  ._device.static.1_40_
                 0x0000000000008674       0x28 zephyr/drivers/gpio/libdrivers__gpio.a(gpio_nrfx.c.obj)
                 0x0000000000008674                __device_dts_ord_18
@@ -4690,10 +4690,10 @@ device_area     0x0000000000008660       0x78
                 0x000000000000869c                __device_dts_ord_8
  ._device.static.3_50_
                 0x00000000000086b0       0x14 zephyr/drivers/flash/libdrivers__flash.a(soc_flash_nrf.c.obj)
-                0x00000000000086b0                __device_dts_ord_79
+                0x00000000000086b0                __device_dts_ord_80
  ._device.static.3_90_
                 0x00000000000086c4       0x14 zephyr/drivers/sensor/nrf5/libdrivers__sensor__nrf5.a(temp_nrf5.c.obj)
-                0x00000000000086c4                __device_dts_ord_67
+                0x00000000000086c4                __device_dts_ord_68
                 0x00000000000086d8                _device_list_end = .
 
 sw_isr_table    0x00000000000086d8      0x180
@@ -6150,7 +6150,7 @@ noinit          0x0000000020002a40     0x3640
  .debug_str     0x000000000000f9f0       0x56 zephyr/kernel/libkernel.a(system_work_q.c.obj)
                                         0x7d6 (size before relaxing)
 
-.debug_loc      0x0000000000000000    0x31304
+.debug_loc      0x0000000000000000    0x312f3
  *(SORT_BY_ALIGNMENT(.debug_loc))
  .debug_loc     0x0000000000000000      0x26e app/libapp.a(main.c.obj)
  .debug_loc     0x000000000000026e      0x422 app/libapp.a(flash_map_extended.c.obj)
@@ -6220,9 +6220,9 @@ noinit          0x0000000020002a40     0x3640
  .debug_loc     0x0000000000028a72      0x583 zephyr/kernel/libkernel.a(mutex.c.obj)
  .debug_loc     0x0000000000028ff5      0x459 zephyr/kernel/libkernel.a(sem.c.obj)
  .debug_loc     0x000000000002944e     0x3386 zephyr/kernel/libkernel.a(work.c.obj)
- .debug_loc     0x000000000002c7d4     0x385f zephyr/kernel/libkernel.a(sched.c.obj)
- .debug_loc     0x0000000000030033      0xc23 zephyr/kernel/libkernel.a(timeout.c.obj)
- .debug_loc     0x0000000000030c56      0x6ae zephyr/kernel/libkernel.a(timer.c.obj)
+ .debug_loc     0x000000000002c7d4     0x3860 zephyr/kernel/libkernel.a(sched.c.obj)
+ .debug_loc     0x0000000000030034      0xc11 zephyr/kernel/libkernel.a(timeout.c.obj)
+ .debug_loc     0x0000000000030c45      0x6ae zephyr/kernel/libkernel.a(timer.c.obj)
 
 .debug_macinfo
  *(SORT_BY_ALIGNMENT(.debug_macinfo))

@@ -38,8 +38,8 @@ static const struct adc_dt_spec adc_channels[] = {
 #define RED_FLASHING_MAX_PERCENT 20
 
 
-#define CHRG_STAT_NODE DT_ALIAS(chrgstat)
-static const struct gpio_dt_spec CHRG_STAT = GPIO_DT_SPEC_GET(CHRG_STAT_NODE, gpios);
+#define SYSINT_NODE DT_ALIAS(sysint)
+static const struct gpio_dt_spec CHRG_RTC_INT = GPIO_DT_SPEC_GET(SYSINT_NODE, gpios);
 
 #define I2C0_PWR_NODE DT_NODELABEL(bq25188)
 static const struct i2c_dt_spec pwr_i2c = I2C_DT_SPEC_GET(I2C0_PWR_NODE);

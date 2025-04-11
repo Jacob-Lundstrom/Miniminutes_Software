@@ -26,8 +26,8 @@ void RTC_set_time_month(uint8_t month);
 void RTC_set_time_year(uint8_t year);
 
 void RTC_set_alarm_time(uint8_t year, int month, int day, int hour, int minute, int second);
-void RTC_set_alarm_time_seconds(uint8_t second);
-void RTC_set_alarm_time_minutes(uint8_t minute);
+void RTC_set_alarm_time_second(uint8_t second);
+void RTC_set_alarm_time_minute(uint8_t minute);
 void RTC_set_alarm_time_hour(uint8_t hour);
 void RTC_set_alarm_time_day(uint8_t day);
 void RTC_disable_alarm(void);
@@ -41,5 +41,7 @@ uint8_t RTC_get_time_hour(void);
 uint8_t RTC_get_time_day(void);
 uint8_t RTC_get_time_month(void);
 uint8_t RTC_get_time_year(void);
+
+uint8_t RTC_check_alarm(void);
 
 #endif

@@ -64,26 +64,26 @@ int PWR_init(void) {
 
 	int ret;
 
-	if (!gpio_is_ready_dt(&CHRG_STAT)) {
+	if (!gpio_is_ready_dt(&CHRG_RTC_INT)) {
 		return 0;
 	}
 
-	ret = gpio_pin_configure_dt(&CHRG_STAT, GPIO_PULL_UP);
+	ret = gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_PULL_UP);
 	if (ret < 0) {
 		return 0;
 	}
 	
-	ret = gpio_pin_configure_dt(&CHRG_STAT, GPIO_INPUT);
+	ret = gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_INPUT);
 	if (ret < 0) {
 		return 0;
 	}
 
-	ret = gpio_pin_interrupt_configure_dt(&CHRG_STAT,GPIO_INT_EDGE_TO_ACTIVE);
+	ret = gpio_pin_interrupt_configure_dt(&CHRG_RTC_INT,GPIO_INT_EDGE_TO_ACTIVE);
 	if (ret < 0) {
 		return 0;
 	}
-	gpio_init_callback(&chrg_stat_pin_cb_data, PWR_wakeup_isr, BIT(CHRG_STAT.pin));
-	ret = gpio_add_callback(CHRG_STAT.port, &chrg_stat_pin_cb_data);
+	gpio_init_callback(&chrg_stat_pin_cb_data, PWR_wakeup_isr, BIT(CHRG_RTC_INT.pin));
+	ret = gpio_add_callback(CHRG_RTC_INT.port, &chrg_stat_pin_cb_data);
 
 	if (ret != 0) {
 		while(1) {

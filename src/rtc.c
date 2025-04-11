@@ -88,12 +88,17 @@ void RTC_set_time_year(uint8_t year){
     write_to_RTC(0x0A, encode(year));
 }
 
-void RTC_set_alarm_time(uint8_t year, int month, int day, int hour, int minute, int second);
-void RTC_set_alarm_time_seconds(uint8_t second){
+void RTC_set_alarm_time(uint8_t year, int month, int day, int hour, int minute, int second) {
+    RTC_set_alarm_time_day(day);
+    RTC_set_alarm_time_hour(hour);
+    RTC_set_alarm_time_minute(minute);
+    RTC_set_alarm_time_second(second);
+}
+void RTC_set_alarm_time_second(uint8_t second){
     if (second > 59) return;
     write_to_RTC(0x0B, encode(second));
 }
-void RTC_set_alarm_time_minutes(uint8_t minute){
+void RTC_set_alarm_time_minute(uint8_t minute){
     if (minute > 59) return; 
     write_to_RTC(0x0C, encode(minute));
 }
@@ -105,6 +110,7 @@ void RTC_set_alarm_time_day(uint8_t day){
     if (day > 31) return;
     write_to_RTC(0x0E, encode(day));
 }
+
 void RTC_disable_alarm(void){
     write_to_RTC(0x01, 0x00);
 }
@@ -143,4 +149,11 @@ uint8_t RTC_get_time_month(void) {
 
 uint8_t RTC_get_time_year(void) {
     return decode(read_from_RTC(0x0A));
+}
+
+
+uint8_t RTC_check_alarm(void) {
+    bool alarm = (read_from_RTC(0x01));
+    if (alarm &  0b01000000) write_to_RTC(0x01, alarm & 0b10111111); // Clear the flag
+    return (alarm & 0b01000000) >> 6;
 }
