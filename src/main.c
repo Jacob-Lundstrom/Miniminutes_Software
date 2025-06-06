@@ -32,6 +32,7 @@
 #include "pwr.h"
 #include "hr.h"
 #include "rtc.h"
+#include "als.h"
 
 #define LOG_LEVEL LOG_LEVEL_DBG
 #include <zephyr/logging/log.h>
@@ -56,17 +57,19 @@ const k_tid_t battery_monitor_thread_id;
 
 static bool military_time = false;
 
-K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main_DEV, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+// 		PRIORITY, 0, 0);
 
 // K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
 // 		PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
+
+uint16_t RDG_DISPLAY_DEV = 0;
 
 int THREAD_battery_monitor (void) {
 	while(1) {
@@ -88,8 +91,8 @@ int THREAD_battery_monitor (void) {
 int THREAD_display (void) {
 	extern bool BLE_RECIEVED_FLAG;
 
-	// while (1)
-	// 	display_arb_all(0x00, 0x00, 0x00, 0x00, num_to_segment(pin_level), 0, 0);
+	while (1)
+		display_integer(RDG_DISPLAY_DEV, 0, 0);
 
 	while(true) {
 		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV)){
@@ -175,47 +178,28 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
+	DISPLAY_ALS_init(); // Only for MicroMinutes
 	Display_init(); // Only for MicroMinutes
-	Motor_init(); // Only for MicroMinutes
+	// Motor_init(); // Only for MicroMinutes
 
 	// HR_init(); // Only for MicroFitness
 	
-	PWR_init();
-	ADC_init();
-	IMU_init();
-	RTC_init();
-
+	// PWR_init();
+	// ADC_init();
+	// IMU_init();
+	// RTC_init();
 }
 
 #include "display.h"
 int THREAD_main_DEV(void) {
+
 	SYSTEM_init();
 
-	enableSegment(1);
-	// enableSegment(1);
-	disableSegment(2);
-	// enableSegmentLow(1);
-
-	gpio_pin_set_dt(&CC7, 0);
-	gpio_pin_set_dt(&CC6, 0);
-	gpio_pin_set_dt(&CC5, 0);
-	gpio_pin_set_dt(&CC4, 0);
-	gpio_pin_set_dt(&CC3, 0);
-	gpio_pin_set_dt(&CC2, 0);
-	gpio_pin_set_dt(&CC1, 0);
-
-	k_thread_suspend(thread_main_id);
 	while(1) {
-
-		// display_word(" 8:00", 5, 1, 1);
 		k_msleep(1000);
-
-		// enableSegment(1);
-
-		// k_msleep(500);
-
-		// disableSegment(1);		
-		// k_msleep(500);
+		uint16_t b = DISPLAY_ALS_get_brightness();
+		// if (b > 0)
+			RDG_DISPLAY_DEV = b;
 	}
 
 	// TODO:

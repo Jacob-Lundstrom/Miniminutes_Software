@@ -1,5 +1,8 @@
 {
     "files.associations": {
         "bluetooth.h": "c"
-    }
+    },
+    "nrf-connect.applications": [
+        "${workspaceFolder}"
+    ]
 }

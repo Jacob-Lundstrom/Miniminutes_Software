@@ -70,5 +70,6 @@ void display_arb(int segment, uint8_t data);
 void display_arb_all(uint8_t s1, uint8_t s2, uint8_t s3, uint8_t s4, uint8_t s5, bool green_ind, bool red_ind);
 void display_word_chars(char c1, char c2, char c3, char c4, char c5, bool green_ind, bool red_ind);
 void display_word(char *word, int len, bool green_ind, bool red_ind);
+void display_integer(uint16_t integer, bool green_ind, bool red_ind);
 
 #endif

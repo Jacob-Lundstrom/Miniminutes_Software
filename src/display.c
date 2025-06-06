@@ -586,3 +586,16 @@ void display_word(char *word, int len, bool green_ind, bool red_ind) {
 	if (len < 5) return; // Invalid word
 	display_word_chars(word[0], word[1], word[2], word[3], word[4], green_ind, red_ind);
 }
+
+void display_integer(uint16_t integer, bool green_ind, bool red_ind) {
+	if (integer >= 0) {
+		int dig1 = integer / 10000;
+		int dig2 = integer / 1000 - dig1 * 10;
+		int dig3 = integer / 100 - dig1 * 100 - dig2 * 10;
+		int dig4 = integer / 10 - dig1 * 1000 - dig2 * 100 - dig3 * 10;
+		int dig5 = integer / 1 - dig1 * 10000 - dig2 * 1000 - dig3 * 100 - dig4 * 10;
+		display_word_chars(dig1, dig2, dig3, dig4, dig5, green_ind, red_ind);
+	} else {
+		display_error(99);
+	}
+}

@@ -1,4 +1,2 @@
 osource "c:/ouroboros-dev/boards/shields/*/Kconfig.shield"
-osource "c:/ouroboros-dev/board_programs/blinky_1/boards/shields/*/Kconfig.shield"
-osource "c:/ncs/v2.6.1/zephyr/samples/subsys/mgmt/mcumgr/smp_svr/boards/shields/*/Kconfig.shield"
 osource "C:/ncs/v2.6.1/nrf/boards/shields/*/Kconfig.shield"

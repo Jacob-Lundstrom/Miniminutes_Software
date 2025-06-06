@@ -20,7 +20,7 @@ config:
   hex_file: zephyr.hex
   bin_file: zephyr.bin
   # Host tools:
-  gdb: C:/ncs/toolchains/2d382dcd92/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb.exe
+  gdb: C:/ncs/toolchains/cf2149caf2/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb.exe
 
 # Runner specific arguments
 args:

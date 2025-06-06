@@ -890,6 +890,12 @@
   reg = <0x51>;
  };
 
+ tsl2584tsv: tsl2584tsv@39{
+  compatible="i2c-device";
+  label="TSL2584TSV";
+  reg = <0x39>;
+ };
+
  bq25188: bq25188@6A{
   compatible="i2c-device";
   label="BQ25188";

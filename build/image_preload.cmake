@@ -1,10 +1,10 @@
 # Generated file that can be used to preload variant images
 set(BOARD "microminutes_v1_1" CACHE INTERNAL "NCS child image controlled")
-set(BOARD_ROOT "c:/ouroboros-dev;c:/ouroboros-dev/board_programs/blinky_1;c:/ncs/v2.6.1/zephyr/samples/subsys/mgmt/mcumgr/smp_svr;C:/ncs/v2.6.1/nrf;C:/ncs/v2.6.1/zephyr" CACHE INTERNAL "NCS child image controlled")
+set(BOARD_ROOT "c:/ouroboros-dev;C:/ncs/v2.6.1/nrf;C:/ncs/v2.6.1/zephyr" CACHE INTERNAL "NCS child image controlled")
 set(CACHED_CONF_FILE "C:/ouroboros-dev/Board_Programs/DEV_KIT_MicroMinutes/prj.conf" CACHE INTERNAL "NCS child image controlled")
 set(CLI_CONFIG_DEBUG_OPTIMIZATIONS "y" CACHE INTERNAL "NCS child image controlled")
 set(CLI_CONFIG_DEBUG_THREAD_INFO "y" CACHE INTERNAL "NCS child image controlled")
 set(CONF_FILE_BUILD_TYPE "" CACHE INTERNAL "NCS child image controlled")
 set(DTC_OVERLAY_FILE "" CACHE INTERNAL "NCS child image controlled")
 set(NCS_TOOLCHAIN_VERSION "NONE" CACHE INTERNAL "NCS child image controlled")
-set(WEST_PYTHON "C:/ncs/toolchains/2d382dcd92/opt/bin/python.exe" CACHE INTERNAL "NCS child image controlled")
+set(WEST_PYTHON "C:/ncs/toolchains/cf2149caf2/opt/bin/python.exe" CACHE INTERNAL "NCS child image controlled")

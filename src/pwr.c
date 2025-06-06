@@ -87,7 +87,7 @@ int PWR_init(void) {
 
 	if (ret != 0) {
 		while(1) {
-			display_error(99);
+			display_error(01);
 		}
 	}
 
