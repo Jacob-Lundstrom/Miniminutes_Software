@@ -17,4 +17,4 @@ int BLE_init(void);
 
 void ble_write_thread(void);
 
-void process_input(BLE_recieved_data);
+void process_input(struct uart_data_t *input);

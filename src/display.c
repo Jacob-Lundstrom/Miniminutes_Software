@@ -143,8 +143,8 @@ void Display_enable_digit(int digit) {
 }
 
 /**
- * \brief			Controls the enabling of the specified digit. Digits are enumerated starting with 1 referring to the furthest left digit.
- * \param			digit: Digit to enable
+ * \brief			Controls the disabling of the specified digit. Digits are enumerated starting with 1 referring to the furthest left digit.
+ * \param			digit: Digit to disable
  */
 void Display_disable_digit(int digit) {
 	if (digit == 1) {
@@ -192,6 +192,30 @@ void Display_disable_all_digits() {
 	gpio_pin_configure_dt(&CA3, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA4, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA5, GPIO_INPUT);
+	
+	// gpio_pin_set_dt(&CA5, 1);
+	// gpio_pin_set_dt(&CA4, 1);
+	// gpio_pin_set_dt(&CA3, 1);
+	// gpio_pin_set_dt(&CA2, 1);
+	// gpio_pin_set_dt(&CA1, 1);
+
+	// Doing this massively reduces the quiescent current draw (by hundreds of uA).
+	// I think this has something to do with GPIO leakage?
+	gpio_pin_set_dt(&CC7, 1);
+	gpio_pin_set_dt(&CC6, 1);
+	gpio_pin_set_dt(&CC5, 1);
+	gpio_pin_set_dt(&CC4, 1);
+	gpio_pin_set_dt(&CC3, 1);
+	gpio_pin_set_dt(&CC2, 1);
+	gpio_pin_set_dt(&CC1, 1);
+	
+	// gpio_pin_configure_dt(&CC1, GPIO_INPUT);
+	// gpio_pin_configure_dt(&CC2, GPIO_INPUT);
+	// gpio_pin_configure_dt(&CC3, GPIO_INPUT);
+	// gpio_pin_configure_dt(&CC4, GPIO_INPUT);
+	// gpio_pin_configure_dt(&CC5, GPIO_INPUT);
+	// gpio_pin_configure_dt(&CC6, GPIO_INPUT);
+	// gpio_pin_configure_dt(&CC7, GPIO_INPUT);
 }
 
 
@@ -524,7 +548,8 @@ void Display_display_arbitrary(int digit, uint8_t data) {
 	// These need to be modified to be variable duty (variable brightness)
 	Display_enable_digit(digit);
 	k_usleep(SEGMENT_MIN_ON_TIME_US);
-	Display_disable_digit(digit);
+	// Display_disable_digit(digit);
+	Display_disable_all_digits();
 	k_usleep(SEGMENT_MIN_OFF_TIME_US);
 }
 
@@ -569,10 +594,9 @@ void Display_display_word_chars(char c1, char c2, char c3, char c4, char c5, boo
  * \param 			red_ind: Controls if the red indication LED will be illuminated
  */
 void Display_display_word(char *word, int len, bool green_ind, bool red_ind) {
-	// THIS HAS NOT BEEN VERIFIED FUNCTIONAL YET
 	if (len > 5) return; // Invalid word
 	uint8_t current_digit = 5 - len + 1;
-	uint8_t* characters[5] = {0,0,0,0,0};
+	uint8_t* characters[5] = {'?','?','?','?','?'};
 	uint8_t count = 0;
 	while (current_digit < 6) {
 		characters[current_digit++ - 1] = word[count++]; 

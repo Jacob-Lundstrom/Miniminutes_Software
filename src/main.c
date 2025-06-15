@@ -70,6 +70,7 @@ K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
 
 uint16_t RDG_DISPLAY_DEV = 0;
+char DISPLAY_MESSAGE[5] = {'?','?','?','?','?'};
 
 int THREAD_battery_monitor (void) {
 	while(1) {
@@ -87,12 +88,12 @@ int THREAD_battery_monitor (void) {
 	}
 }
 
-// int pin_level = 1;
+
 int THREAD_display (void) {
 	extern bool BLE_RECIEVED_FLAG;
 
 	while(true) {
-		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV) & 0){
+		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV)){
 				// Make sure that we do nothing if the battery is too low.
 				k_thread_suspend(display_thread_id);
 		} else {
@@ -103,7 +104,10 @@ int THREAD_display (void) {
 				Display_display_percent(battery_p);
 			} else if (show_voltage) {
 				Display_display_battery_voltage_mv(battery_mv);
+			} else if (show_message) {
+				Display_display_word(DISPLAY_MESSAGE, sizeof(DISPLAY_MESSAGE), show_message_green, show_message_red);
 			} else {
+				for (int i = 0; i<sizeof(DISPLAY_MESSAGE); i++) DISPLAY_MESSAGE[i] = '?';
 				k_thread_suspend(display_thread_id);
 			}
 		}
@@ -112,7 +116,7 @@ int THREAD_display (void) {
 
 int THREAD_display_DEV (void) {
 	while (1)
-		Display_display_integer(RDG_DISPLAY_DEV, 0, 0);
+		Display_display_word(DISPLAY_MESSAGE, sizeof(DISPLAY_MESSAGE),true, true);
 }
 
 void stop_display(void) {
@@ -120,6 +124,7 @@ void stop_display(void) {
 	show_time = false;
 	show_percent = false;
 	show_voltage = false;
+	show_message = false;
 
 	display_timeout_isr(NULL);
 }
@@ -130,12 +135,13 @@ void continue_check_input(void) {
 	show_time = false;
 	show_percent = false;
 	show_voltage = false;
+	show_message = false;
 	
 	resume_main_thread();
 }
 
 void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
-	if (show_time || show_percent || show_voltage){
+	if (show_time || show_percent || show_voltage || show_message){
 		return;
 	} else {
 		continue_showing_time();
@@ -148,10 +154,10 @@ void PWR_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t
 
 void display_timeout_isr(struct k_timer *dummy) {
 	if (!(always_on || (charging_display_mode && is_charging))) {
-		// need_to_check_input = false;
 		show_time = false;
 		show_percent = false;
 		show_voltage = false;
+		show_message = false;
 	}
 	k_timer_stop(&display_timeout);
 }
@@ -190,8 +196,12 @@ void SYSTEM_init(void) {
 	ADC_init();
 	// IMU_init();
 
-	// RTC init should never be needed. This will reset the clock and lose the current time.
-	// RTC_init();
+	// RTC reset should never be needed. This will reset the clock and lose the current time.
+	// RTC_reset();
+	// RTC_enable_half_minute_interrupt();
+	// RTC_enable_minute_interrupt();
+	// RTC_enable_timer_interrupts();
+
 }
 
 #include "display.h"
@@ -262,16 +272,27 @@ int THREAD_main(void) {
 	is_charging = PWR_get_is_on_charger();
 	// set_display_mode_while_charging(DISPLAY_PERCENT_WHILE_CHARGING);
 	set_display_mode_while_charging(DISPLAY_VOLTAGE_WHILE_CHARGING);
-	
+	need_to_check_input = true;
 
 	while(1) {
 		if (need_to_check_input) {
-			is_charging = PWR_get_is_on_charger();
-			bool rtc_alarm = RTC_check_alarm();
+			// is_charging = PWR_get_is_on_charger();
+			// bool rtc_alarm_flag = RTC_check_alarm_flag();
+			// bool rtc_timer_flag = RTC_check_timer_flag();
+			is_charging = 0;
+			bool rtc_alarm_flag = false;
+			bool rtc_timer_flag = false;
+
+
 			need_to_check_input = false;
-			// if (rtc_alarm); // do something
+			if (rtc_alarm_flag) {
+				continue_showing_time();
+			} else if (rtc_timer_flag) {
+				continue_showing_time();
+			}
 			if (is_charging) display_while_charging();
 			
+			k_msleep(100);
 		} else {
 			k_thread_suspend(thread_main_id);
 		}
@@ -299,6 +320,8 @@ void continue_showing_time(void){
 	show_percent = false;
 	show_voltage = false;
 	
+	show_message = false;
+
 	resume_display();
 }
 
@@ -306,6 +329,8 @@ void continue_showing_battery_percent(void){
 	show_time = false;
 	show_percent = true;
 	show_voltage = false;
+
+	show_message = false;
 
 	resume_display();
 }
@@ -315,6 +340,22 @@ void continue_showing_battery_voltage(void){
 	show_percent = false;
 	show_voltage = true;
 
+	show_message = false;
+
+	resume_display();
+}
+
+void continue_showing_message(char *msg, uint8_t length, bool green_status, bool red_status){
+	show_time = false;
+	show_percent = false;
+	show_voltage = false;
+
+	show_message = true;
+	show_message_green = green_status;
+	show_message_red = red_status;
+	for (int i = 0; i < sizeof(DISPLAY_MESSAGE); i++) DISPLAY_MESSAGE[i] = '?';
+	for (int i = 0; i < sizeof(DISPLAY_MESSAGE) & i < length; i++) DISPLAY_MESSAGE[i] = msg[i];
+	
 	resume_display();
 }
 
@@ -372,8 +413,10 @@ void Motor_init(void) {
 
 void Motor_on(void) {
 	gpio_pin_set_dt(&motor, 1);
+	// gpio_pin_configure_dt(&motor, GPIO_OUTPUT_ACTIVE);
 }
 
 void Motor_off(void) {
 	gpio_pin_set_dt(&motor, 0);
+	// gpio_pin_configure_dt(&motor, GPIO_INPUT);
 }

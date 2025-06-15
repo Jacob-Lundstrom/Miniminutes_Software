@@ -1,3 +1,6 @@
+#ifndef MAIN_H
+#define MAIN_H
+
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
@@ -21,6 +24,11 @@ static bool need_to_check_input;
 static bool show_time;
 static bool show_percent;
 static bool show_voltage;
+
+static bool show_message;
+static bool show_message_green;
+static bool show_message_red;
+
 static bool always_on;
 // static bool always_on_while_charging; // Deprecated
 static uint8_t charging_display_mode;
@@ -36,11 +44,13 @@ int THREAD_main_DEV(void);
 int THREAD_main(void);
 int THREAD_battery_monitor(void);
 int THREAD_display(void);
+int THREAD_display_DEV(void);
 
 void resume_display(void);
 void continue_showing_time(void);
 void continue_showing_battery_percent(void);
 void continue_showing_battery_voltage(void);
+void continue_showing_message(char *msg, uint8_t length, bool green_status, bool red_status);
 
 void set_time(uint32_t time);
 void set_military_time(bool status);
@@ -63,3 +73,4 @@ void set_display_mode_while_charging(uint8_t state);
 void Motor_init(void);
 void Motor_on(void);
 void Motor_off(void);
+#endif

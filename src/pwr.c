@@ -4,6 +4,8 @@ static struct gpio_callback chrg_stat_pin_cb_data;
 
 /**
  * \brief 			Function to handle writing to the BMS over the I2C bus.
+ * \param           reg: Register address to write to
+ * \param           val: Value to write to specified register address
  * \return          0 if the I2C write was successful, 1 if there was an error in communication.
  */
 uint8_t write_to_pwr(uint8_t reg, uint8_t val) {
@@ -234,6 +236,9 @@ uint32_t read_battery_voltage(void) {
 	PWR_init();
 	// At this point, we also need to check for missed interrupts.
 	// Check the BMS and the RTC.
+	if (RTC_check_alarm_flag()) continue_showing_time();
+	if (RTC_check_timer_flag()) continue_showing_battery_voltage();
+	is_charging = PWR_get_is_on_charger();
 
 	// END MODIFICATION FOR LOAD SWITCH
 	

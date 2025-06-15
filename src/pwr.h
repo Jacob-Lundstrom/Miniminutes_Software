@@ -2,6 +2,7 @@
 #define PWR_H
 
 #include "main.h"
+#include "rtc.h"
 
 #include <inttypes.h>
 #include <stddef.h>

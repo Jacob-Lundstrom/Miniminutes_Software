@@ -128,6 +128,8 @@ void HR_disable(void) {
 
 /**
  * \brief 			Function to handle writing to the HR LED driver over the I2C bus.
+ * \param           reg: Register address to write to
+ * \param           val: Value to write to specified register address
  * \return          0 if the I2C write was successful, 1 if there was an error in communication.
  */
 uint8_t write_to_HR_LED_driver(uint8_t reg, uint8_t val) {
@@ -167,6 +169,8 @@ uint8_t read_from_HR_LED_driver(uint8_t reg) {
 
 /**
  * \brief 			Function to handle writing to the HR ALS over the I2C bus.
+ * \param           reg: Register address to write to
+ * \param           val: Value to write to specified register address
  * \return          0 if the I2C write was successful, 1 if there was an error in communication.
  */
 uint8_t write_to_HR_ALS(uint8_t reg, uint8_t val) {

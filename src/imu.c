@@ -5,6 +5,8 @@ static struct gpio_callback pin_cb_data;
 
 /**
  * \brief 			Function to handle writing to the IMU over the I2C bus.
+ * \param           reg: Register address to write to
+ * \param           val: Value to write to specified register address
  * \return          0 if the I2C write was successful, 1 if there was an error in communication.
  */
 uint8_t write_to_IMU(uint8_t reg, uint8_t val) {

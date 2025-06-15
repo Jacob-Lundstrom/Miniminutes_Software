@@ -87,6 +87,8 @@ uint8_t Display_ALS_check_ID(void) {
 
 /**
  * \brief 			Function to handle writing to the ALS over the I2C bus.
+ * \param           reg: Register address to write to
+ * \param           val: Value to write to specified register address
  * \return          0 if the I2C write was successful, 1 if there was an error in communication.
  */
 uint8_t write_to_Display_ALS(uint8_t reg, uint8_t val) {

@@ -315,6 +315,7 @@ int BLE_init(void)
 	err = bt_le_adv_start(BT_LE_ADV_CONN_CUSTOM, ad, ARRAY_SIZE(ad), sd,
 			      ARRAY_SIZE(sd));
 	
+	
 	// Advertises every 0.1 s
 	// err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
 	// 		      ARRAY_SIZE(sd));
@@ -423,6 +424,10 @@ void process_input(struct uart_data_t *input) {
 	} else if ((input->data[0] == 'D') && (input->data[1] == 'M') && (input->data[2] == 'W') && (input->data[3] == 'C') && (input->data[4] == '=') && ((input->data[5] >= '0') && (input->data[5] <= '9'))) {
 		uint8_t req = (input->data[5] - '0');
 		set_display_mode_while_charging(req);
+		BLE_RECIEVED_FLAG = true;
+	} 
+	else if ((input->data[0] == 'S') && (input->data[1] == 'M') && (input->data[2] == '=') && (input->len >= 3) && (input->len <= 8)) {
+		continue_showing_message(&(input->data[3]), input->len - 3, false, false);
 		BLE_RECIEVED_FLAG = true;
 	}
 }
