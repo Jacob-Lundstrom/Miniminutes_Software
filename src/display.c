@@ -5,7 +5,7 @@
 #include "display.h"
 
 /**
- * \brief			Initializes the GPIO that are used to control the 7-segment displays.
+ * \brief			Initializes the GPIO that are used to control the 7-segment digits.
  */
 int Display_init() {
 
@@ -123,70 +123,70 @@ int Display_init() {
 
 
 /**
- * \brief			Controls the enabling of the specified display number
- * \param			segment: Display number to enable
+ * \brief			Controls the enabling of the specified digit. Digits are enumerated starting with 1 referring to the furthest left digit.
+ * \param			digit: Digit to enable
  */
-void enableSegment(int segment) {
-	if (segment == 1) {
+void Display_enable_digit(int digit) {
+	if (digit == 1) {
 		gpio_pin_configure_dt(&CA1, GPIO_OUTPUT_ACTIVE);
-	} else if (segment == 2) {
+	} else if (digit == 2) {
 		gpio_pin_configure_dt(&CA2, GPIO_OUTPUT_ACTIVE);
-	} else if (segment == 3) {
+	} else if (digit == 3) {
 		gpio_pin_configure_dt(&CA3, GPIO_OUTPUT_ACTIVE);
-	} else if (segment == 4) {
+	} else if (digit == 4) {
 		gpio_pin_configure_dt(&CA4, GPIO_OUTPUT_ACTIVE);
-	} else if (segment == 5) {
+	} else if (digit == 5) {
 		gpio_pin_configure_dt(&CA5, GPIO_OUTPUT_ACTIVE);
 	} else {
-		disableSegments();
+		Display_disable_all_digits();
 	}
 }
 
 /**
- * \brief			Controls the enabling of the specified display number
- * \param			segment: Display number to enable
+ * \brief			Controls the enabling of the specified digit. Digits are enumerated starting with 1 referring to the furthest left digit.
+ * \param			digit: Digit to enable
  */
-void disableSegment(int segment) {
-	if (segment == 1) {
+void Display_disable_digit(int digit) {
+	if (digit == 1) {
 		gpio_pin_configure_dt(&CA1, GPIO_INPUT);
-	} else if (segment == 2) {
+	} else if (digit == 2) {
 		gpio_pin_configure_dt(&CA2, GPIO_INPUT);
-	} else if (segment == 3) {
+	} else if (digit == 3) {
 		gpio_pin_configure_dt(&CA3, GPIO_INPUT);
-	} else if (segment == 4) {
+	} else if (digit == 4) {
 		gpio_pin_configure_dt(&CA4, GPIO_INPUT);
-	} else if (segment == 5) {
+	} else if (digit == 5) {
 		gpio_pin_configure_dt(&CA5, GPIO_INPUT);
 	} else {
-		disableSegments();
+		Display_disable_all_digits();
 	}
 }
 
 /**
- * \brief			Controls the enabling of the specified display number, active Low output. This should only be used to turn on indication LEDs.
- * \param			segment: Display number to enable with a low output.
+ * \brief			Controls the enabling of the specified digit with a low output. This should only be used to turn on indication LEDs.
+ * \param			digit: Digit to enable with a low output.
  */
-void enableSegmentLow(int segment) {
-	if (segment == 1) {
+void Display_enable_digit_low(int digit) {
+	if (digit == 1) {
 	  gpio_pin_configure_dt(&CA1, GPIO_OUTPUT_INACTIVE);
-	} else if (segment == 2) {
+	} else if (digit == 2) {
 	  gpio_pin_configure_dt(&CA2, GPIO_OUTPUT_INACTIVE);
-	} else if (segment == 3) {
+	} else if (digit == 3) {
 	  gpio_pin_configure_dt(&CA3, GPIO_OUTPUT_INACTIVE);
-	} else if (segment == 4) {
+	} else if (digit == 4) {
 	  gpio_pin_configure_dt(&CA4, GPIO_OUTPUT_INACTIVE);
-	} else if (segment == 5) {
+	} else if (digit == 5) {
 	  gpio_pin_configure_dt(&CA5, GPIO_OUTPUT_INACTIVE);
 	} else {
-	  disableSegments();
+	  Display_disable_all_digits();
 	}
 }
 
 
 /**
- * \brief			Changes all of the high-side GPIOs to inputs to disable the displays.
+ * \brief			Changes all digits to inactive (High-Z).
  */
-void disableSegments() {
+void Display_disable_all_digits() {
 	gpio_pin_configure_dt(&CA1, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA2, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA3, GPIO_INPUT);
@@ -198,84 +198,68 @@ void disableSegments() {
 /**
  * \brief			Helper function to turn off the display.
  */
-void displayNone() {
-	disableSegments();
+void Display_display_none() {
+	Display_disable_all_digits();
 }
 
 
 /**
- * \brief			Allows for the display of a number on a specified display number.
- * \param			num: Number to be displayed on a display
- * \param			segment: Display number to show the requested number on
+ * \brief			Allows for the display of a number on a specified digit.
+ * \param			num: Number to be displayed on a digit
+ * \param			digit: Digit to show the requested number on
  */
-void displayNumberOnSegment(uint8_t num, int segment) {
-  if (num == 0) display_arb(segment, 0b01111110);
-  if (num == 1) display_arb(segment, 0b00001100);
-  if (num == 2) display_arb(segment, 0b10110110);
-  if (num == 3) display_arb(segment, 0b10011110);
-  if (num == 4) display_arb(segment, 0b11001100);
-  if (num == 5) display_arb(segment, 0b11011010);
-  if (num == 6) display_arb(segment, 0b11111010);
-  if (num == 7) display_arb(segment, 0b00001110);
-  if (num == 8) display_arb(segment, 0b11111110);
-  if (num == 9) display_arb(segment, 0b11011110);
-  if (num > 9) display_arb(segment, 0b00000000);
+void Display_display_number_on_digit(uint8_t num, int digit) {
+  if (num == 0) Display_display_arbitrary(digit, 0b01111110);
+  if (num == 1) Display_display_arbitrary(digit, 0b00001100);
+  if (num == 2) Display_display_arbitrary(digit, 0b10110110);
+  if (num == 3) Display_display_arbitrary(digit, 0b10011110);
+  if (num == 4) Display_display_arbitrary(digit, 0b11001100);
+  if (num == 5) Display_display_arbitrary(digit, 0b11011010);
+  if (num == 6) Display_display_arbitrary(digit, 0b11111010);
+  if (num == 7) Display_display_arbitrary(digit, 0b00001110);
+  if (num == 8) Display_display_arbitrary(digit, 0b11111110);
+  if (num == 9) Display_display_arbitrary(digit, 0b11011110);
+  if (num > 9) Display_display_arbitrary(digit, 0b00000000);
 }
 
 
 /**
- * \brief			Displays a colon on display number 3. This is used in displaying the time.
+ * \brief			Displays a colon on digit 3. This is used in displaying the time.
  */
-void displayColon(){
-	display_arb(3, char_to_segment(':'));
+void Display_display_colon(){
+	Display_display_arbitrary(3, Display_convert_character_to_segments(':'));
 }
 
 
 /**
- * \brief			Displays the time.
- * \param			numN: Number to display on display number N.
+ * \brief			Displays the time, with the ability to control what number is shown on each digit.
+ * \param			numN: Number to display on digit N.
  * \param			colon: Controls whether or not the colon is on.
  * \param 			green_ind: Controls if the green indication LED will be illuminated
  * \param 			red_ind: Controls if the red indication LED will be illuminated
  */
-void displayTime(int num1, int num2, bool colon, int num4, int num5, bool green_ind, bool red_ind) {
-	display_arb_all(num_to_segment(num1),
-					num_to_segment(num2), 
-					(colon*char_to_segment(':')),
-					num_to_segment(num4), 
-					num_to_segment(num5),
+void Display_display_time(int num1, int num2, bool colon, int num4, int num5, bool green_ind, bool red_ind) {
+	display_arb_all(Display_convert_number_to_segments(num1),
+					Display_convert_number_to_segments(num2), 
+					(colon*Display_convert_character_to_segments(':')),
+					Display_convert_number_to_segments(num4), 
+					Display_convert_number_to_segments(num5),
 					green_ind,
 					red_ind);
 }
 
 
 /**
- * \brief			Quick method that takes an input time in seconds and displays the time.
- */
-void display_time_seconds(int time_seconds) {
-	
-	int hr = time_seconds / (60*60) ;
-	int min = time_seconds / (60) - 60 * hr;
-	
-	int dig1 = hr/10;
-	int dig2 = hr - dig1 * 10;
-	int dig3 = min/10;
-	int dig4 = min - dig3 * 10;
-	displayTime(dig1, dig2, true, dig3, dig4, false, false);
-}
-
-
-/**
- * \brief			Displays the current time, with the ability to toggle military time conversion.
+ * \brief			Displays the current time, with the ability to toggle 24-hour time or 12-hour time.
  * \param			time_seconds: The time in seconds since midnight.
- * \param			military_time: Controls whether the shown time is in 24-hour time (`true`) or 12-hour time (`false`)
+ * \param			time_24h: Controls whether the shown time is in 24-hour time (`true`) or 12-hour time (`false`)
  */
-void display_time_seconds_mil(int time_seconds, bool military_time, bool show_colon) {
+void Display_display_time_seconds(int time_seconds, bool time_24h, bool show_colon) {
 	
 	int hr = time_seconds / (60*60) ;
 	int min = time_seconds / (60) - 60 * hr;
 	
-	if (!military_time) {
+	if (!time_24h) {
 		if (hr == 0){
 			hr = 12;
 		}
@@ -289,30 +273,30 @@ void display_time_seconds_mil(int time_seconds, bool military_time, bool show_co
 	int dig3 = min/10;
 	int dig4 = min - dig3 * 10;
 
-	if (!military_time) {
+	if (!time_24h) {
 		if (dig1 == 0) {
 			dig1 = -1; // Don't show the highest hour time if using non-24 hr time.
 		}
 	}
-	displayTime(dig1, dig2, show_colon, dig3, dig4, false, false);
+	Display_display_time(dig1, dig2, show_colon, dig3, dig4, false, false);
 }
 
 
 /**
- * \brief			Quick function that dispays a specified character on the desired display number.
+ * \brief			Quick function that dispays a specified character on the desired digit.
  * \param			letter: Character to be displayed
- * \param			segment: The display number to display the requested character
+ * \param			digit: The digit to display the requested character
  */
-void display_letter_on_segment(char letter, int segment) {
-	display_arb(segment, char_to_segment(letter));
+void display_letter_on_segment(char letter, int digit) {
+	Display_display_arbitrary(digit, Display_convert_character_to_segments(letter));
 }
 
 
 /**
- * \brief			Displays the provided error code on the displays.
+ * \brief			Displays the provided error code on the display.
  * \param			error_number: The corresponding error number to be displayed.
  */
-void display_error(uint8_t error_number) {
+void Display_display_error(uint8_t error_number) {
 	if (error_number > 99) return; 
 
 	uint8_t e1;
@@ -328,7 +312,7 @@ void display_error(uint8_t error_number) {
 /**
  * \brief			Displays credits.
  */
-void display_credits(void) {
+void Display_display_credits(void) {
 	display_word("by:JL", 5, 1, 1);
 }
 
@@ -337,7 +321,7 @@ void display_credits(void) {
  * \brief			Displays the battery percentage on the displays.
  * \param			percent: The battery's percent charge.
  */
-void display_percent(int percent) {
+void Display_display_percent(int percent) {
 	int p = percent;
 
 	uint16_t T_flash_ms = 250; // ms
@@ -346,12 +330,12 @@ void display_percent(int percent) {
 
 
 	if (p > 99) {
-		display_arb_all(num_to_segment(1), num_to_segment(0), num_to_segment(0), 0b00011010, 0b01010010, 1, 0);
+		display_arb_all(Display_convert_number_to_segments(1), Display_convert_number_to_segments(0), Display_convert_number_to_segments(0), 0b00011010, 0b01010010, 1, 0);
 		return;
 	}
 	
 	if (p < 0) {
-		display_arb_all(num_to_segment(0), 0x00, 0x00, 0b00011010, 0b01010010, 0, 1);
+		display_arb_all(Display_convert_number_to_segments(0), 0x00, 0x00, 0b00011010, 0b01010010, 0, 1);
 		return;
 	}
 
@@ -359,19 +343,19 @@ void display_percent(int percent) {
 	int dig2 = p - dig1 * 10;
 	
 	if (p < 10) {
-		display_arb_all(num_to_segment(dig2), 0x00, 0x00, 0b00011010, 0b01010010, g, r);
+		display_arb_all(Display_convert_number_to_segments(dig2), 0x00, 0x00, 0b00011010, 0b01010010, g, r);
 		return;
 	}
 
-	display_arb_all(num_to_segment(dig1), num_to_segment(dig2), 0x00 , 0b00011010, 0b01010010, g, r);
+	display_arb_all(Display_convert_number_to_segments(dig1), Display_convert_number_to_segments(dig2), 0x00 , 0b00011010, 0b01010010, g, r);
 }
 
 
 /**
- * \brief			Displays the Battery voltage on the displays.
+ * \brief			Displays the Battery voltage on the display.
  * \param			mv: The battery voltage, in millivolts.
  */
-void display_battery_voltage_mv(int mv) {
+void Display_display_battery_voltage_mv(int mv) {
 	int p = get_battery_percentage(mv);
 	if (mv > 0) {
 		int dig1 = mv / 1000;
@@ -394,7 +378,7 @@ void display_battery_voltage_mv(int mv) {
 
 		display_word_chars(dig1, '_', dig2, dig3, dig4, g, r);
 	} else {
-		display_error(99);
+		Display_display_error(99);
 	}
 }
 
@@ -404,7 +388,7 @@ void display_battery_voltage_mv(int mv) {
  * \param			number: input number to convert to LED data. Valid numbers are 0-9.
  * \return			Data corresponding to the correct segments to illuminate for the number to be displayed.
  */
-uint8_t num_to_segment(uint8_t number){
+uint8_t Display_convert_number_to_segments(uint8_t number){
 	if ((number < 0) | (number > 9)) {
 		return 0; // displays nothing
 	} else {
@@ -428,13 +412,13 @@ uint8_t num_to_segment(uint8_t number){
  * \param			character: input character to convert to LED data
  * \return			Data corresponding to the correct segments to illuminate for the character to be displayed.
  */
-uint8_t char_to_segment(uint8_t character) {
+uint8_t Display_convert_character_to_segments(uint8_t character) {
 	
 	// I haven't double checked most of these.
 	// Follows the sample given on https://en.wikipedia.org/wiki/Seven-segment_display_character_representations
 	
-	if ((character >= 0) & (character <= 9)) return num_to_segment(character); 
-	if ((character >= '0') & (character <= '9')) return num_to_segment(character - '0'); 
+	if ((character >= 0) & (character <= 9)) return Display_convert_number_to_segments(character); 
+	if ((character >= '0') & (character <= '9')) return Display_convert_number_to_segments(character - '0'); 
 
 	if ((character >= 'A') & (character <= 'Z')) {
 		if (character == 'A') return (0b11101110);
@@ -508,11 +492,11 @@ uint8_t char_to_segment(uint8_t character) {
 
 
 /**
- * \brief			Allows the display of arbitrary segment configurations on a given 7-segment display number.
- * \param			segment: Number of the 7-segment display which will have the character displayed on
- * \param			data: Data corresponding to the configuration to be displayed. Bits 7-1 correspond to segments G-A, respectively. Bit 0 is used to enable an indication LED, if it is associated with the display segment. Otherwise, bit 0 does nothing.
+ * \brief			Allows the display of arbitrary segment configurations on a given 7-segment digit.
+ * \param			digit: Digit which will have the requested character displayed on.
+ * \param			data: Data corresponding to the configuration to be displayed. Bits 7-1 correspond to segments G-A, respectively. Bit 0 is used to enable an indication LED, if it is associated with the display digit. Otherwise, bit 0 does nothing.
  */
-void display_arb(int segment, uint8_t data) {
+void Display_display_arbitrary(int digit, uint8_t data) {
 
 	uint8_t out_states = 0xFF - data;
 	gpio_pin_set_dt(&CC7, ((out_states >> 7) & 1));
@@ -523,70 +507,85 @@ void display_arb(int segment, uint8_t data) {
 	gpio_pin_set_dt(&CC2, ((out_states >> 2) & 1));
 	gpio_pin_set_dt(&CC1, ((out_states >> 1) & 1));
 
-	if (segment == 1) {
+	if (digit == 1) {
 		// Check if we should turn on the corresponding indication LEDs
 		if (data & 1) {
-			enableSegmentLow(2); // Red
+			Display_enable_digit_low(2); // Red
 		}
 	}
 
-	if (segment == 2) {
+	if (digit == 2) {
 		// Check if we should turn on the corresponding indication LEDs
 		if (data & 1) {
-			enableSegmentLow(1); // Green
+			Display_enable_digit_low(1); // Green
 		}
 	}
 
-	enableSegment(segment);
+	// These need to be modified to be variable duty (variable brightness)
+	Display_enable_digit(digit);
 	k_usleep(SEGMENT_MIN_ON_TIME_US);
-	disableSegment(segment);
+	Display_disable_digit(digit);
+	k_usleep(SEGMENT_MIN_OFF_TIME_US);
 }
 
 
 /**
- * \brief           Allows the display of arbitrary segment configurations on all 7-segment displays
- * \param[in]       sN: Data to be displayed on display N.
+ * \brief           Allows the display of arbitrary digit configurations on all digits
+ * \param[in]       sN: Data corresponding to the configuration to be displayed on digit N. Bits 7-1 correspond to segments G-A, respectively. Bit 0 does nothing.
  * \param[in]       green_ind: Controls if the green indication LED will be illuminated
  * \param[in]       red_ind: Controls if the red indication LED will be illuminated
  */
-void display_arb_all(uint8_t s1, uint8_t s2, uint8_t s3, uint8_t s4, uint8_t s5, bool green_ind, bool red_ind){
-	display_arb(1, s1);
-	display_arb(1, red_ind);
+void display_arb_all(uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, bool green_ind, bool red_ind){
+	Display_display_arbitrary(1, d1 & 0xFE);
+	Display_display_arbitrary(1, red_ind);
 	
-	display_arb(2, s2);
-	display_arb(2, green_ind);
+	Display_display_arbitrary(2, d2 & 0xFE);
+	Display_display_arbitrary(2, green_ind);
 	
-	display_arb(3, s3);
+	Display_display_arbitrary(3, d3);
 	
-	display_arb(4, s4);
+	Display_display_arbitrary(4, d4);
 	
-	display_arb(5, s5);
+	Display_display_arbitrary(5, d5);
 }
 
 
 /**
- * \brief           Displays the given characters on their corresponding display number.
+ * \brief           Displays the given characters on their corresponding digit.
  * \param[in]       cN: Character to be displayed on display N.
  * \param[in]       green_ind: Controls if the green indication LED will be illuminated
  * \param[in]       red_ind: Controls if the red indication LED will be illuminated
  */
 void display_word_chars(char c1, char c2, char c3, char c4, char c5, bool green_ind, bool red_ind) {
-	display_arb_all(char_to_segment(c1), char_to_segment(c2), char_to_segment(c3), char_to_segment(c4), char_to_segment(c5), green_ind, red_ind);
+	display_arb_all(Display_convert_character_to_segments(c1), Display_convert_character_to_segments(c2), Display_convert_character_to_segments(c3), Display_convert_character_to_segments(c4), Display_convert_character_to_segments(c5), green_ind, red_ind);
 }
 
 
 /**
- * \brief 			Displays the given word on all of the 
- * \param 			word: Word to be displayed on the displays. Must have a length of 5 or more characters.
+ * \brief 			Displays the given word on all of the digits in the display.
+ * \param 			word: Word to be displayed on the displays. Maximumlength of 5 or more characters.
  * \param 			len: Length of the word to be displayed
  * \param 			green_ind: Controls if the green indication LED will be illuminated
  * \param 			red_ind: Controls if the red indication LED will be illuminated
  */
 void display_word(char *word, int len, bool green_ind, bool red_ind) {
-	if (len < 5) return; // Invalid word
-	display_word_chars(word[0], word[1], word[2], word[3], word[4], green_ind, red_ind);
+	// THIS HAS NOT BEEN VERIFIED FUNCTIONAL YET
+	if (len > 5) return; // Invalid word
+	uint8_t current_digit = 5 - len + 1;
+	uint8_t* characters[5] = {0,0,0,0,0};
+	uint8_t count = 0;
+	while (current_digit < 6) {
+		characters[current_digit++ - 1] = word[count++]; 
+	}
+	display_word_chars(characters[0], characters[1], characters[2], characters[3], characters[4], green_ind, red_ind);
 }
 
+/**
+ * \brief 			Displays the given integer on the display.
+ * \param 			integer: Requested integer to display.
+ * \param 			green_ind: Controls if the green indication LED will be illuminated
+ * \param 			red_ind: Controls if the red indication LED will be illuminated
+ */
 void display_integer(uint16_t integer, bool green_ind, bool red_ind) {
 	if (integer >= 0) {
 		int dig1 = integer / 10000;
@@ -596,6 +595,7 @@ void display_integer(uint16_t integer, bool green_ind, bool red_ind) {
 		int dig5 = integer / 1 - dig1 * 10000 - dig2 * 1000 - dig3 * 100 - dig4 * 10;
 		display_word_chars(dig1, dig2, dig3, dig4, dig5, green_ind, red_ind);
 	} else {
-		display_error(99);
+		// Display_display_error(99);
+		return;
 	}
 }

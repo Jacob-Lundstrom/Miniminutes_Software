@@ -29,7 +29,7 @@ static const struct adc_dt_spec adc_channels[] = {
 			     DT_SPEC_AND_COMMA)
 };
 
-#define BATTERY_ADC_SCALE_FACTOR (3.0/2.0)
+#define BATTERY_ADC_SCALE_FACTOR (2.0) // 3.0/2.0 for older versions without load switch
 #define BATTERY_MIN_VOLTAGE_MV 3500
 #define BATTERY_MAX_VOLTAGE_MV 4200
 

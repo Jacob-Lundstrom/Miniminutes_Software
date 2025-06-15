@@ -57,14 +57,14 @@ const k_tid_t battery_monitor_thread_id;
 
 static bool military_time = false;
 
-K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main_DEV, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-// 		PRIORITY, 0, 0);
+K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
 
-// K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
-// 		PRIORITY, 0, 0);
+K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
@@ -73,7 +73,7 @@ uint16_t RDG_DISPLAY_DEV = 0;
 
 int THREAD_battery_monitor (void) {
 	while(1) {
-		k_msleep(900);
+		k_msleep(9900);
 		if (is_charging) {
 			PWR_disconnect_from_charger();
 			k_msleep(100); // Wait for the voltage on the cap to stabilize
@@ -91,26 +91,28 @@ int THREAD_battery_monitor (void) {
 int THREAD_display (void) {
 	extern bool BLE_RECIEVED_FLAG;
 
-	while (1)
-		display_integer(RDG_DISPLAY_DEV, 0, 0);
-
 	while(true) {
-		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV)){
+		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV) & 0){
 				// Make sure that we do nothing if the battery is too low.
 				k_thread_suspend(display_thread_id);
 		} else {
 			if (show_time) {
 				uint32_t t = RTC_get_time();
-				display_time_seconds_mil(t, military_time, t % 2 );
+				Display_display_time_seconds(t, military_time, t % 2 );
 			} else if (show_percent) {
-				display_percent(battery_p);
+				Display_display_percent(battery_p);
 			} else if (show_voltage) {
-				display_battery_voltage_mv(battery_mv);
+				Display_display_battery_voltage_mv(battery_mv);
 			} else {
 				k_thread_suspend(display_thread_id);
 			}
 		}
 	}
+}
+
+int THREAD_display_DEV (void) {
+	while (1)
+		display_integer(RDG_DISPLAY_DEV, 0, 0);
 }
 
 void stop_display(void) {
@@ -178,29 +180,31 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
-	DISPLAY_ALS_init(); // Only for MicroMinutes
+	// DISPLAY_ALS_init(); // Only for MicroMinutes
 	Display_init(); // Only for MicroMinutes
-	// Motor_init(); // Only for MicroMinutes
+	Motor_init(); // Only for MicroMinutes
 
 	// HR_init(); // Only for MicroFitness
 	
-	// PWR_init();
-	// ADC_init();
+	PWR_init();
+	ADC_init();
 	// IMU_init();
+
+	// RTC init should never be needed. This will reset the clock and lose the current time.
 	// RTC_init();
 }
 
 #include "display.h"
 int THREAD_main_DEV(void) {
 
-	SYSTEM_init();
+	// SYSTEM_init();
 
-	while(1) {
-		k_msleep(1000);
-		uint16_t b = DISPLAY_ALS_get_brightness();
-		// if (b > 0)
-			RDG_DISPLAY_DEV = b;
-	}
+	// while(1) {
+	// 	k_msleep(1000);
+	// 	uint16_t b = DISPLAY_ALS_get_brightness();
+	// 	// if (b > 0)
+	// 		RDG_DISPLAY_DEV = b;
+	// }
 
 	// TODO:
 	// Test all the functions that I wrote for the RTC
@@ -210,6 +214,11 @@ int THREAD_main_DEV(void) {
 	SYSTEM_init();
 	// HR_disable();
 	RTC_set_time(0, 0, 0);
+	continue_showing_time();
+
+	while(1) {
+		k_msleep(100);
+	}
 
 	int64_t red_avg = 0;
 	int64_t green_avg = 0;
@@ -246,13 +255,6 @@ int THREAD_main(void) {
 	// 		- Add vibration functionality, fix IMU problem
 
 	SYSTEM_init();		
-
-	while(1) {
-		Motor_on();
-		k_msleep(1000);
-		Motor_off();
-		k_msleep(1000);
-	}
 
 	// This is required for the display to begin showing info immediately after startup
 	k_msleep(1000); // wait for the other threads to finish initializing before starting

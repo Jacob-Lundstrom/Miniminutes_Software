@@ -87,7 +87,7 @@ int PWR_init(void) {
 
 	if (ret != 0) {
 		while(1) {
-			display_error(01);
+			Display_display_error(01);
 		}
 	}
 
@@ -140,6 +140,23 @@ uint32_t read_battery_voltage(void) {
 		return BATTERY_MIN_VOLTAGE_MV;
 	}
 
+	// BEGIN MODIFICATION FOR LOAD SWITCH
+	int ret;
+	
+	// I have to do this for some reason? I think its because setting pull-up to this pin changes it to open drain config for output.
+	ret = gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_PIN_CNF_PULL_Disabled); 
+
+	ret += gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_OPEN_DRAIN);
+	ret += gpio_pin_set_dt(&CHRG_RTC_INT, 1); 
+	ret += gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_OUTPUT);
+
+	k_msleep(30);
+
+	if (ret < 0) {
+		Display_display_error(33);
+	}
+	// END MODIFICATION FOR LOAD SWITCH
+
 	// printk("ADC reading[%u]:\n", count++);
 	for(int k = 0; k < rdgs; k++) {
 	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++) {
@@ -179,6 +196,14 @@ uint32_t read_battery_voltage(void) {
 		}
 	}
 	}
+	
+	// BEGIN MODIFICATION FOR LOAD SWITCH
+	PWR_init();
+	// At this point, we also need to check for missed interrupts.
+	// Check the BMS and the RTC.
+
+	// END MODIFICATION FOR LOAD SWITCH
+	
 	if (rdgs == 0) return 0;
 	return (avg / rdgs) * BATTERY_ADC_SCALE_FACTOR;
 }
