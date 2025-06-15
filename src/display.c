@@ -239,7 +239,7 @@ void Display_display_colon(){
  * \param 			red_ind: Controls if the red indication LED will be illuminated
  */
 void Display_display_time(int num1, int num2, bool colon, int num4, int num5, bool green_ind, bool red_ind) {
-	display_arb_all(Display_convert_number_to_segments(num1),
+	Display_display_arb_all(Display_convert_number_to_segments(num1),
 					Display_convert_number_to_segments(num2), 
 					(colon*Display_convert_character_to_segments(':')),
 					Display_convert_number_to_segments(num4), 
@@ -305,7 +305,7 @@ void Display_display_error(uint8_t error_number) {
 	e1 = error_number / 10;
 	e2 = error_number % 10;
 
-	display_word_chars('E', 'r', 'r', e1, e2, 0, 1);
+	Display_display_word_chars('E', 'r', 'r', e1, e2, 0, 1);
 }
 
 
@@ -313,7 +313,7 @@ void Display_display_error(uint8_t error_number) {
  * \brief			Displays credits.
  */
 void Display_display_credits(void) {
-	display_word("by:JL", 5, 1, 1);
+	Display_display_word("by:JL", 5, 1, 1);
 }
 
 
@@ -330,12 +330,12 @@ void Display_display_percent(int percent) {
 
 
 	if (p > 99) {
-		display_arb_all(Display_convert_number_to_segments(1), Display_convert_number_to_segments(0), Display_convert_number_to_segments(0), 0b00011010, 0b01010010, 1, 0);
+		Display_display_arb_all(Display_convert_number_to_segments(1), Display_convert_number_to_segments(0), Display_convert_number_to_segments(0), 0b00011010, 0b01010010, 1, 0);
 		return;
 	}
 	
 	if (p < 0) {
-		display_arb_all(Display_convert_number_to_segments(0), 0x00, 0x00, 0b00011010, 0b01010010, 0, 1);
+		Display_display_arb_all(Display_convert_number_to_segments(0), 0x00, 0x00, 0b00011010, 0b01010010, 0, 1);
 		return;
 	}
 
@@ -343,11 +343,11 @@ void Display_display_percent(int percent) {
 	int dig2 = p - dig1 * 10;
 	
 	if (p < 10) {
-		display_arb_all(Display_convert_number_to_segments(dig2), 0x00, 0x00, 0b00011010, 0b01010010, g, r);
+		Display_display_arb_all(Display_convert_number_to_segments(dig2), 0x00, 0x00, 0b00011010, 0b01010010, g, r);
 		return;
 	}
 
-	display_arb_all(Display_convert_number_to_segments(dig1), Display_convert_number_to_segments(dig2), 0x00 , 0b00011010, 0b01010010, g, r);
+	Display_display_arb_all(Display_convert_number_to_segments(dig1), Display_convert_number_to_segments(dig2), 0x00 , 0b00011010, 0b01010010, g, r);
 }
 
 
@@ -376,7 +376,7 @@ void Display_display_battery_voltage_mv(int mv) {
 			dig4 = 9;
 		}
 
-		display_word_chars(dig1, '_', dig2, dig3, dig4, g, r);
+		Display_display_word_chars(dig1, '_', dig2, dig3, dig4, g, r);
 	} else {
 		Display_display_error(99);
 	}
@@ -535,7 +535,7 @@ void Display_display_arbitrary(int digit, uint8_t data) {
  * \param[in]       green_ind: Controls if the green indication LED will be illuminated
  * \param[in]       red_ind: Controls if the red indication LED will be illuminated
  */
-void display_arb_all(uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, bool green_ind, bool red_ind){
+void Display_display_arb_all(uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, bool green_ind, bool red_ind){
 	Display_display_arbitrary(1, d1 & 0xFE);
 	Display_display_arbitrary(1, red_ind);
 	
@@ -556,8 +556,8 @@ void display_arb_all(uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5,
  * \param[in]       green_ind: Controls if the green indication LED will be illuminated
  * \param[in]       red_ind: Controls if the red indication LED will be illuminated
  */
-void display_word_chars(char c1, char c2, char c3, char c4, char c5, bool green_ind, bool red_ind) {
-	display_arb_all(Display_convert_character_to_segments(c1), Display_convert_character_to_segments(c2), Display_convert_character_to_segments(c3), Display_convert_character_to_segments(c4), Display_convert_character_to_segments(c5), green_ind, red_ind);
+void Display_display_word_chars(char c1, char c2, char c3, char c4, char c5, bool green_ind, bool red_ind) {
+	Display_display_arb_all(Display_convert_character_to_segments(c1), Display_convert_character_to_segments(c2), Display_convert_character_to_segments(c3), Display_convert_character_to_segments(c4), Display_convert_character_to_segments(c5), green_ind, red_ind);
 }
 
 
@@ -568,7 +568,7 @@ void display_word_chars(char c1, char c2, char c3, char c4, char c5, bool green_
  * \param 			green_ind: Controls if the green indication LED will be illuminated
  * \param 			red_ind: Controls if the red indication LED will be illuminated
  */
-void display_word(char *word, int len, bool green_ind, bool red_ind) {
+void Display_display_word(char *word, int len, bool green_ind, bool red_ind) {
 	// THIS HAS NOT BEEN VERIFIED FUNCTIONAL YET
 	if (len > 5) return; // Invalid word
 	uint8_t current_digit = 5 - len + 1;
@@ -577,7 +577,7 @@ void display_word(char *word, int len, bool green_ind, bool red_ind) {
 	while (current_digit < 6) {
 		characters[current_digit++ - 1] = word[count++]; 
 	}
-	display_word_chars(characters[0], characters[1], characters[2], characters[3], characters[4], green_ind, red_ind);
+	Display_display_word_chars(characters[0], characters[1], characters[2], characters[3], characters[4], green_ind, red_ind);
 }
 
 /**
@@ -586,14 +586,14 @@ void display_word(char *word, int len, bool green_ind, bool red_ind) {
  * \param 			green_ind: Controls if the green indication LED will be illuminated
  * \param 			red_ind: Controls if the red indication LED will be illuminated
  */
-void display_integer(uint16_t integer, bool green_ind, bool red_ind) {
+void Display_display_integer(uint16_t integer, bool green_ind, bool red_ind) {
 	if (integer >= 0) {
 		int dig1 = integer / 10000;
 		int dig2 = integer / 1000 - dig1 * 10;
 		int dig3 = integer / 100 - dig1 * 100 - dig2 * 10;
 		int dig4 = integer / 10 - dig1 * 1000 - dig2 * 100 - dig3 * 10;
 		int dig5 = integer / 1 - dig1 * 10000 - dig2 * 1000 - dig3 * 100 - dig4 * 10;
-		display_word_chars(dig1, dig2, dig3, dig4, dig5, green_ind, red_ind);
+		Display_display_word_chars(dig1, dig2, dig3, dig4, dig5, green_ind, red_ind);
 	} else {
 		// Display_display_error(99);
 		return;

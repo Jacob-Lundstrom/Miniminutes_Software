@@ -27,13 +27,13 @@ static const struct i2c_dt_spec display_als_i2c = I2C_DT_SPEC_GET(I2C0_DISPLAY_A
 #define DISPLAY_ALS_REG_ID2                 0x1E
 
 
-void DISPLAY_ALS_init(void);
-uint8_t writeToDisplayALS(uint8_t reg, uint8_t val);
-uint8_t readFromDisplayALS(uint8_t reg);
-uint8_t commandDisplayALS(uint8_t COMMAND);
+void Display_ALS_init(void);
+uint8_t write_to_Display_ALS(uint8_t reg, uint8_t val);
+uint8_t read_from_Display_ALS(uint8_t reg);
+uint8_t command_Display_ALS(uint8_t COMMAND);
 void enable_Display_ALS_interrupt(void);
-uint16_t DISPLAY_ALS_get_brightness(void);
-uint8_t DISPLAY_ALS_set_gain(uint8_t gain);
-uint8_t DISPLAY_ALS_check_ID(void);
-uint8_t DISPLAY_ALS_set_exposure_ms(float exposure_ms);
-uint8_t DISPLAY_ALS_set_gain(uint8_t gain);
+int32_t Display_ALS_get_brightness(void);
+uint8_t Display_ALS_set_gain(uint8_t gain);
+uint8_t Display_ALS_check_ID(void);
+uint8_t Display_ALS_set_exposure_ms(float exposure_ms);
+uint8_t Display_ALS_set_gain(uint8_t gain);

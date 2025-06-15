@@ -53,7 +53,7 @@ int PWR_init(void);
 int PWR_disconnect_from_charger(void);
 int PWR_reconnect_to_charger(void);
 bool PWR_get_is_on_charger(void);
-bool PWR_get_charge_status(void);
+uint8_t PWR_get_charge_status(void);
 
 uint32_t read_battery_voltage(void);
 uint8_t get_battery_percentage(uint32_t battery_mv);

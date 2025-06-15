@@ -32,7 +32,7 @@
 #include "pwr.h"
 #include "hr.h"
 #include "rtc.h"
-#include "als.h"
+#include "display_als.h"
 
 #define LOG_LEVEL LOG_LEVEL_DBG
 #include <zephyr/logging/log.h>
@@ -112,7 +112,7 @@ int THREAD_display (void) {
 
 int THREAD_display_DEV (void) {
 	while (1)
-		display_integer(RDG_DISPLAY_DEV, 0, 0);
+		Display_display_integer(RDG_DISPLAY_DEV, 0, 0);
 }
 
 void stop_display(void) {
@@ -180,7 +180,7 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
-	// DISPLAY_ALS_init(); // Only for MicroMinutes
+	// Display_ALS_init(); // Only for MicroMinutes
 	Display_init(); // Only for MicroMinutes
 	Motor_init(); // Only for MicroMinutes
 
@@ -201,7 +201,7 @@ int THREAD_main_DEV(void) {
 
 	// while(1) {
 	// 	k_msleep(1000);
-	// 	uint16_t b = DISPLAY_ALS_get_brightness();
+	// 	uint16_t b = Display_ALS_get_brightness();
 	// 	// if (b > 0)
 	// 		RDG_DISPLAY_DEV = b;
 	// }

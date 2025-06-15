@@ -2,6 +2,10 @@
 
 static struct gpio_callback chrg_stat_pin_cb_data;
 
+/**
+ * \brief 			Function to handle writing to the BMS over the I2C bus.
+ * \return          0 if the I2C write was successful, 1 if there was an error in communication.
+ */
 uint8_t write_to_pwr(uint8_t reg, uint8_t val) {
 
 	while (!device_is_ready(pwr_i2c.bus));
@@ -14,7 +18,11 @@ uint8_t write_to_pwr(uint8_t reg, uint8_t val) {
 	return 0;
 }
 
-
+/**
+ * \brief 			Function to handle reading from the BMS over the I2C bus.
+ * \param           reg: Register address in the BMS to read from.
+ * \return          Value stored at the requested register address.
+ */
 uint8_t read_from_pwr(uint8_t reg) {
 
 	while (!device_is_ready(pwr_i2c.bus));
@@ -43,6 +51,10 @@ struct adc_sequence sequence = {
 	.buffer_size = sizeof(buf),
 };
 
+/**
+ * \brief		Initializes the ADC channel used for measuring the battery voltage.
+ * \return		0 on success, error number on failure.
+ */
 int ADC_init(void) {
 	/* Configure channels individually prior to sampling. */
 	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++) {
@@ -57,9 +69,13 @@ int ADC_init(void) {
 			return 0;
 		}
 	}
+	return 1;
 }
 
-
+/**
+ * \brief		Initializes the BMS.
+ * \return		1 on success, 0 on failure.
+ */
 int PWR_init(void) {
 
 	int ret;
@@ -108,28 +124,45 @@ int PWR_init(void) {
 
 	write_to_pwr(0x0C, 0b11100000); // Enables only necessary PG / VINOVP interrupt
 
-	return 0;
+	return 1;
 }
 
-int PWR_disconnect_from_charger(){
-	write_to_pwr(0x0A, (read_from_pwr(0x0A) & !(0b11 << 2)) | (0b1 << 2)); // V_SYS = V_BATT
-	return 0;
+/**
+ * \brief		Causes the BMS to disconnect the input voltage from the rest of the system. System voltage is supplied from battery only.
+ * \return		0 on success, 1 on failure
+ */
+int PWR_disconnect_from_charger(void){
+	return write_to_pwr(0x0A, (read_from_pwr(0x0A) & !(0b11 << 2)) | (0b1 << 2)); // V_SYS = V_BATT
 }
 
-int PWR_reconnect_to_charger() {
-	write_to_pwr(0x0A, (read_from_pwr(0x0A) & !(0b11 << 2))); // V_SYS = V_INDPM
-	return 0;
+/**
+ * \brief		Causes the BMS to connect the input voltage, if present, to the rest of the system. System voltage is supplied from input if present, and from battery if not.
+ * \return		0 on success, 1 on failure
+ */
+int PWR_reconnect_to_charger(void) {
+	return write_to_pwr(0x0A, (read_from_pwr(0x0A) & !(0b11 << 2))); // V_SYS = V_INDPM
 }
 
-
-bool PWR_get_is_on_charger() {
+/**
+ * \brief		Determines if there is a supplied voltage on VIN
+ * \return		1 if VIN present, 0 otherwise.
+ */
+bool PWR_get_is_on_charger(void) {
 	return (read_from_pwr(0x00 * 0b1)); // VIN Power good
 }
 
-bool PWR_get_charge_status() {
+/**
+ * \brief		Determines the charge progress of the battery.
+ * \return		`0b00` for Not Charging, `0b01` for Constant Current charging, `0b10` for Constant Voltage Charging, or `0b11` for Charge Done.
+ */
+uint8_t PWR_get_charge_status(void) {
 	return ((read_from_pwr(0x00) & (0b01100000)) >> 5); //(00 -> not charging, 01 -> CC, 10 -> CV, 11 -> Charge Done)
 }
 
+/**
+ * \brief		Samples the battery voltage 100 times, then returns the average.
+ * \return		Average of 100 samples of ADC measurements, in mV
+ */
 uint32_t read_battery_voltage(void) {
 	uint32_t avg = 0;
 	int rdgs = 100;
@@ -208,6 +241,10 @@ uint32_t read_battery_voltage(void) {
 	return (avg / rdgs) * BATTERY_ADC_SCALE_FACTOR;
 }
 
+/**
+ * \brief		Converts a given battery voltage in mV to a battery charge percentage.
+ * \return		Nearest integer percent of battery charge remaining.
+ */
 uint8_t get_battery_percentage(uint32_t battery_mv){
 	return 100 * (battery_mv - BATTERY_MIN_VOLTAGE_MV) / 
 	(BATTERY_MAX_VOLTAGE_MV - BATTERY_MIN_VOLTAGE_MV);

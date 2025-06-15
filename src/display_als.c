@@ -1,10 +1,10 @@
-#include "als.h"
+#include "display_als.h"
 
 /**
  * \brief 			Sends a byte of information to the COMMAND register in the ALS.
  * \param 			COMMAND: Byte to be written to COMMAND register.
  */
-uint8_t commandDisplayALS(uint8_t COMMAND) {
+uint8_t command_Display_ALS(uint8_t COMMAND) {
     while (!device_is_ready(display_als_i2c.bus));
 	uint8_t config[1] = {COMMAND | 0x80}; // This just ensures that the command register is actually addressed.
 	int ret = i2c_write_dt(&display_als_i2c, config, sizeof(config));
@@ -18,39 +18,39 @@ uint8_t commandDisplayALS(uint8_t COMMAND) {
 /**
  * \brief 			Initializes the ALS with some acceptable settings to get the current brightness.
  */
-void DISPLAY_ALS_init() {
-    writeToDisplayALS(DISPLAY_ALS_REG_CONTROL, 1);
-    writeToDisplayALS(DISPLAY_ALS_REG_TIMING, 0xFF);
-    writeToDisplayALS(DISPLAY_ALS_REG_INTERRUPT, 0x12);
-    writeToDisplayALS(DISPLAY_ALS_REG_THH_HIGH, 0x00);
-    writeToDisplayALS(DISPLAY_ALS_REG_THH_LOW, 0x00);
-    writeToDisplayALS(DISPLAY_ALS_REG_THL_HIGH, 0x00);
-    writeToDisplayALS(DISPLAY_ALS_REG_THL_LOW, 0x00);
-    // writeToDisplayALS(DISPLAY_ALS_REG_ANALOG, 2);
-    DISPLAY_ALS_set_gain(8);
-    writeToDisplayALS(DISPLAY_ALS_REG_CONTROL, 3);
-    // writeToDisplayALS(DISPLAY_ALS_REG_TIMING, 0x);
-    DISPLAY_ALS_set_exposure_ms(10);
+void Display_ALS_init() {
+    write_to_Display_ALS(DISPLAY_ALS_REG_CONTROL, 1);
+    write_to_Display_ALS(DISPLAY_ALS_REG_TIMING, 0xFF);
+    write_to_Display_ALS(DISPLAY_ALS_REG_INTERRUPT, 0x12);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THH_HIGH, 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THH_LOW, 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THL_HIGH, 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THL_LOW, 0x00);
+    // write_to_Display_ALS(DISPLAY_ALS_REG_ANALOG, 2);
+    Display_ALS_set_gain(8);
+    write_to_Display_ALS(DISPLAY_ALS_REG_CONTROL, 3);
+    // write_to_Display_ALS(DISPLAY_ALS_REG_TIMING, 0x);
+    Display_ALS_set_exposure_ms(10);
     return;
 
     // For debugging:
     // while(1) { k_msleep(500);
-    //     readFromDisplayALS(DISPLAY_ALS_REG_CONTROL   );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_TIMING    );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_INTERRUPT );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_THL_LOW   );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_THL_HIGH  );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_THH_LOW   );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_THH_HIGH  );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_ANALOG    );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_ID        );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_DATA0_LOW );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_DATA0_HIGH);
-    //     readFromDisplayALS(DISPLAY_ALS_REG_DATA1_LOW );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_DATA1_HIGH);
-    //     readFromDisplayALS(DISPLAY_ALS_REG_TIMER_LOW );
-    //     readFromDisplayALS(DISPLAY_ALS_REG_TIMER_HIGH);
-    //     readFromDisplayALS(DISPLAY_ALS_REG_ID2       );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_CONTROL   );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_TIMING    );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_INTERRUPT );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_THL_LOW   );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_THL_HIGH  );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_THH_LOW   );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_THH_HIGH  );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_ANALOG    );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_ID        );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_DATA0_LOW );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_DATA0_HIGH);
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_DATA1_LOW );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_DATA1_HIGH);
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_TIMER_LOW );
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_TIMER_HIGH);
+    //     read_from_Display_ALS(DISPLAY_ALS_REG_ID2       );
     // }
 }
 
@@ -58,14 +58,14 @@ void DISPLAY_ALS_init() {
  * \brief 			Gets the intensity of illumination onto the sensor.
  * \return          Illumination of the photodiode array in lux. -1 corresponds to an invalid reading.
  */
-int32_t DISPLAY_ALS_get_brightness(void) {
-    // commandDisplayALS(0b11100001);
-    uint8_t CONTROL = readFromDisplayALS(0x00);
+int32_t Display_ALS_get_brightness(void) {
+    // command_Display_ALS(0b11100001);
+    uint8_t CONTROL = read_from_Display_ALS(0x00);
     if (((CONTROL & 0x20) && (CONTROL & 0x10))  ) {
-        uint16_t D0L = readFromDisplayALS(DISPLAY_ALS_REG_DATA0_LOW);
-        uint16_t D0H = readFromDisplayALS(DISPLAY_ALS_REG_DATA0_HIGH);
-        uint16_t D1L = readFromDisplayALS(DISPLAY_ALS_REG_DATA1_LOW);
-        uint16_t D1H = readFromDisplayALS(DISPLAY_ALS_REG_DATA1_HIGH);
+        uint16_t D0L = read_from_Display_ALS(DISPLAY_ALS_REG_DATA0_LOW);
+        uint16_t D0H = read_from_Display_ALS(DISPLAY_ALS_REG_DATA0_HIGH);
+        uint16_t D1L = read_from_Display_ALS(DISPLAY_ALS_REG_DATA1_LOW);
+        uint16_t D1H = read_from_Display_ALS(DISPLAY_ALS_REG_DATA1_HIGH);
     
         
         // genericWriteToDisplayALS(0b11100001); // Should clear interrupts??
@@ -79,9 +79,9 @@ int32_t DISPLAY_ALS_get_brightness(void) {
  * \brief 			Checks the identity of the ALS sensor.
  * \return          True if the sensor's ID is correct, False otherwise.
  */
-uint8_t DISPLAY_ALS_check_ID(void) {
-    uint8_t id1 = readFromDisplayALS(DISPLAY_ALS_REG_ID);
-    uint8_t id2 = readFromDisplayALS(DISPLAY_ALS_REG_ID2);
+uint8_t Display_ALS_check_ID(void) {
+    uint8_t id1 = read_from_Display_ALS(DISPLAY_ALS_REG_ID);
+    uint8_t id2 = read_from_Display_ALS(DISPLAY_ALS_REG_ID2);
     return ((id1 & 0xF0) == 0x90) && ((id2 & 0x80));
 }
 
@@ -89,7 +89,7 @@ uint8_t DISPLAY_ALS_check_ID(void) {
  * \brief 			Function to handle writing to the ALS over the I2C bus.
  * \return          0 if the I2C write was successful, 1 if there was an error in communication.
  */
-uint8_t writeToDisplayALS(uint8_t reg, uint8_t val) {
+uint8_t write_to_Display_ALS(uint8_t reg, uint8_t val) {
 	while (!device_is_ready(display_als_i2c.bus));
 	uint8_t config[2] = {reg | 0x80, val};
 	int ret = i2c_write_dt(&display_als_i2c, config, sizeof(config));
@@ -102,11 +102,11 @@ uint8_t writeToDisplayALS(uint8_t reg, uint8_t val) {
 
 
 /**
- * \brief 			Function to handle Reading from the Display ALS over the I2C bus.
+ * \brief 			Function to handle reading from the Display ALS over the I2C bus.
  * \param           reg: Register address in the Display ALS to read from.
  * \return          Value stored at the requested register address.
  */
-uint8_t readFromDisplayALS(uint8_t reg) {
+uint8_t read_from_Display_ALS(uint8_t reg) {
 
 	while (!device_is_ready(display_als_i2c.bus));
 	uint8_t config[1] = {reg | 0x80};
@@ -129,7 +129,7 @@ uint8_t readFromDisplayALS(uint8_t reg) {
  * \param           exposure_ms: The desired exposure time, in milliseconds. Values range from 2.7ms to 688.5 ms.
  * \return          0 if the I2C write was successful, 1 if there was an error in communication.
  */
-uint8_t DISPLAY_ALS_set_exposure_ms(float exposure_ms) {
+uint8_t Display_ALS_set_exposure_ms(float exposure_ms) {
     uint8_t atime = 0;
     if ( exposure_ms >= 688.5 ) 
     {
@@ -143,7 +143,7 @@ uint8_t DISPLAY_ALS_set_exposure_ms(float exposure_ms) {
     {
         atime = 0xFF - ( uint8_t ) ( exposure_ms / 2.7 );
     }
-    return writeToDisplayALS(DISPLAY_ALS_REG_TIMING, atime );
+    return write_to_Display_ALS(DISPLAY_ALS_REG_TIMING, atime );
 }
 
 /**
@@ -151,7 +151,7 @@ uint8_t DISPLAY_ALS_set_exposure_ms(float exposure_ms) {
  * \param           gain: The desired sensor gaine. Valid settings are 1, 8, 16, or 111 (high-gain mode).
  * \return          0 if the I2C write was successful, 1 if there was an error in communication or an invalid gain was requested.
  */
-uint8_t DISPLAY_ALS_set_gain(uint8_t gain) {
+uint8_t Display_ALS_set_gain(uint8_t gain) {
     uint8_t data = 0;
     switch ( gain )
     {
@@ -180,5 +180,5 @@ uint8_t DISPLAY_ALS_set_gain(uint8_t gain) {
             return 1;
         }
     }
-    return writeToDisplayALS(DISPLAY_ALS_REG_ANALOG, data);
+    return write_to_Display_ALS(DISPLAY_ALS_REG_ANALOG, data);
 }

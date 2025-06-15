@@ -24,8 +24,7 @@ static const struct i2c_dt_spec imu_i2c = I2C_DT_SPEC_GET(I2C0_IMU_NODE);
 #endif
 
 void IMU_init(void);
-uint8_t writeToIMU(uint8_t reg, uint8_t val);
-uint8_t readFromIMU(uint8_t reg);
-void enableInt1(void);
+uint8_t write_to_IMU(uint8_t reg, uint8_t val);
+uint8_t read_from_IMU(uint8_t reg);
 
 #endif
