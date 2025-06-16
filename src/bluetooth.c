@@ -417,18 +417,107 @@ void process_input(struct uart_data_t *input) {
 		BLE_RECIEVED_FLAG = true;
 		return;
 	} else if ((input->data[0] == 'A') && (input->data[1] == 'O') && (input->data[2] == '=') && ((input->data[3] == '0') || (input->data[3] == '1'))) {
+		// Always On [AO=%1 OR 0%]
 		bool req = false;
 		if (input->data[3] == '1') req = true;
 		set_always_on(req);
 		BLE_RECIEVED_FLAG = true;
 	} else if ((input->data[0] == 'D') && (input->data[1] == 'M') && (input->data[2] == 'W') && (input->data[3] == 'C') && (input->data[4] == '=') && ((input->data[5] >= '0') && (input->data[5] <= '9'))) {
+		// Display Mode While Charging [DMWC=%mode%] where mode = 0-4
 		uint8_t req = (input->data[5] - '0');
 		set_display_mode_while_charging(req);
 		BLE_RECIEVED_FLAG = true;
-	} 
-	else if ((input->data[0] == 'S') && (input->data[1] == 'M') && (input->data[2] == '=') && (input->len >= 3) && (input->len <= 8)) {
+	} else if ((input->data[0] == 'S') && (input->data[1] == 'M') && (input->data[2] == '=') && (input->len >= 3) && (input->len <= 8)) {
+		// Show Message [SM=%message%]
 		continue_showing_message(&(input->data[3]), input->len - 3, false, false);
 		BLE_RECIEVED_FLAG = true;
+	} else if ((input->data[0] == 'D') && (input->data[1] == 'C') && (input->data[2] == '=') && (input->len >= 4) && (input->len <= 6)) {
+		// Duty Cycle of display [DC=###] where ### = 0-100
+		// Not doing any input handling at the moment.
+		uint8_t last_digit_index = input->len - 1;
+		double duty = 0;
+		char msg[3] = {'?','?','?'};
+		if (last_digit_index == 5) {
+			msg[0] = input->data[3];
+			msg[1] = input->data[4];
+			msg[2] = input->data[5];
+
+			duty =  (input->data[5] - '0') + 10 * (input->data[4] - '0') + 100 * (input->data[3] - '0');
+		} else if (last_digit_index == 4) {
+			msg[0] = '0';
+			msg[1] = input->data[3];
+			msg[2] = input->data[4];
+
+			duty = (input->data[4] - '0') + 10 * (input->data[3] - '0');
+		} else if (last_digit_index == 3) {
+			msg[0] = '0';
+			msg[1] = '0';
+			msg[2] = input->data[3];
+			duty = (input->data[3] - '0');
+		}
+		duty /= 100;
+		Display_set_duty_cycle(duty);
+		continue_showing_message(msg, sizeof(msg), true, true);
+	} else if ((input->data[0] == 'D') && (input->data[1] == 'F') && (input->data[2] == '=') && (input->len >= 4) && (input->len <= 7)) {
+		// Display Framerate [DF=####] where #### = 10-1200, in Hz.
+		// Not doing any input handling at the moment.
+		uint8_t last_digit_index = input->len - 1;
+		double frq = 0;
+		char msg[4] = {'?','?','?','?'};
+		if (last_digit_index == 6) {
+			msg[0] = input->data[3];
+			msg[1] = input->data[4];
+			msg[2] = input->data[5];
+			msg[3] = input->data[6];
+
+			frq =  (input->data[6] - '0') + 10 * (input->data[5] - '0') + 100 * (input->data[4] - '0') + 1000 * (input->data[3] - '0');
+		} else if (last_digit_index == 5) {
+			msg[0] = '0';
+			msg[1] = input->data[3];
+			msg[2] = input->data[4];
+			msg[3] = input->data[5];
+
+			frq = (input->data[5] - '0') + 10 * (input->data[4] - '0') + 100 * (input->data[3] - '0');
+		} else if (last_digit_index == 4) {
+			msg[0] = '0';
+			msg[1] = '0';
+			msg[2] = input->data[3];
+			msg[3] = input->data[4];
+
+			frq = (input->data[4] - '0') + 10 * (input->data[3] - '0');
+		} else {
+			return;
+		}
+		
+		Display_set_framerate(frq);
+		continue_showing_message(msg, sizeof(msg), true, true);
+	} else if ((input->data[0] == 'D') && (input->data[1] == 'C') && (input->data[2] == '=') && (input->len >= 4) && (input->len <= 6)) {
+		// Duty Cycle of display [DC=###] where ### = 0-100
+		// Not doing any input handling at the moment.
+		uint8_t last_digit_index = input->len - 1;
+		double duty = 0;
+		char msg[3] = {'?','?','?'};
+		if (last_digit_index == 5) {
+			msg[0] = input->data[3];
+			msg[1] = input->data[4];
+			msg[2] = input->data[5];
+
+			duty =  (input->data[5] - '0') + 10 * (input->data[4] - '0') + 100 * (input->data[3] - '0');
+		} else if (last_digit_index == 4) {
+			msg[0] = '0';
+			msg[1] = input->data[3];
+			msg[2] = input->data[4];
+
+			duty = (input->data[4] - '0') + 10 * (input->data[3] - '0');
+		} else if (last_digit_index == 3) {
+			msg[0] = '0';
+			msg[1] = '0';
+			msg[2] = input->data[3];
+			duty = (input->data[3] - '0');
+		}
+		duty /= 100;
+		Display_set_duty_cycle(duty);
+		continue_showing_message(msg, sizeof(msg), true, true);
 	}
 }
 

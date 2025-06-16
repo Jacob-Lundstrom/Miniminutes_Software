@@ -8,6 +8,7 @@
  *  @brief Nordic UART Bridge Service (NUS) sample
  */
 
+#include "display.h"
 
 #define BLE_STACKSIZE CONFIG_BT_NUS_THREAD_STACK_SIZE
 

@@ -1,6 +1,6 @@
 {
     "format-version": 0,
-    "time": 1750016094,
+    "time": 1750034723,
     "files": [
         {
             "load_address": 49664,
@@ -8,15 +8,15 @@
             "type": "application",
             "board": "microminutes_v1_1",
             "soc": "nRF52833_QDAA",
-            "size": 165908,
+            "size": 168516,
             "file": "app_update.bin",
-            "modtime": 1750016094
+            "modtime": 1750034723
         }
     ],
     "name": "DEV_KIT_MicroMinutes",
     "firmware": {
         "zephyr": {
-            "revision": "046e4fef21da4ceae1e16d23b80277452cccf0f7-dirty"
+            "revision": "d246272ae4174be3fee0f83acfa3e67a3f81c3aa-dirty"
         },
         "nrf": {
             "revision": "eef645c4a31201df353fdff5447262d7675fa1c1-dirty"

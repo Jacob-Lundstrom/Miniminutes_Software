@@ -5,6 +5,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 #include "pwr.h"
+#include "math.h"
 
 #define CA1_NODE DT_ALIAS(ca1)
 #define CA2_NODE DT_ALIAS(ca2)
@@ -20,9 +21,6 @@
 #define CC6_NODE DT_ALIAS(cc6)
 #define CC7_NODE DT_ALIAS(cc7)
 
-#define SEGMENT_MIN_ON_TIME_US 300
-#define SEGMENT_MIN_OFF_TIME_US 1
-
 static const struct gpio_dt_spec CA1 = GPIO_DT_SPEC_GET(CA1_NODE, gpios);
 static const struct gpio_dt_spec CA2 = GPIO_DT_SPEC_GET(CA2_NODE, gpios);
 static const struct gpio_dt_spec CA3 = GPIO_DT_SPEC_GET(CA3_NODE, gpios);
@@ -37,8 +35,15 @@ static const struct gpio_dt_spec CC5 = GPIO_DT_SPEC_GET(CC5_NODE, gpios);
 static const struct gpio_dt_spec CC6 = GPIO_DT_SPEC_GET(CC6_NODE, gpios);
 static const struct gpio_dt_spec CC7 = GPIO_DT_SPEC_GET(CC7_NODE, gpios);
 
+static uint32_t DISPLAY_PERIOD_US = 8333;
+static double DISPLAY_DUTY_CYCLE = 1;
+
 
 int Display_init();
+void Display_set_duty_cycle(double duty);
+void Display_set_framerate(double fps);
+void Display_set_period(uint32_t period_us);
+
 void Display_enable_digit(int digit);
 void Display_disable_digit(int digit);
 void Display_enable_digit_low(int digit);

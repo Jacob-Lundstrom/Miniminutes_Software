@@ -121,6 +121,47 @@ int Display_init() {
 	return 0;
 }
 
+/**
+ * \brief 			Controls the duty cycle of the display
+ * \param			duty: duty cycle of each of the display segments. Valid values vary between 0-1.
+ */
+void Display_set_duty_cycle(double duty) {
+	if (duty > 1.0) {
+		DISPLAY_DUTY_CYCLE = 1;
+	} else if (duty < 0) {
+		DISPLAY_DUTY_CYCLE = 0;
+	} else {
+		DISPLAY_DUTY_CYCLE = duty;
+	}
+}
+
+/**
+ * \brief			Controls the frame rate of the display
+ * \param			fps: Target FPS for the display's cycle rate. Each frame is split into 7 sub-frames, one for each digit and one for each indicator. Valid FPS is 10Hz to 1200Hz.
+ */
+void Display_set_framerate(double fps) {
+	if (fps > 1200) {
+		DISPLAY_PERIOD_US = (uint32_t) ( pow(10,6) / 1200.0 );
+	} else if (fps < 10) {
+		DISPLAY_PERIOD_US = (uint32_t) ( pow(10,6) / 10.0 );
+	} else {
+		DISPLAY_PERIOD_US = (uint32_t) ( pow(10,6) / fps );
+	}
+}
+
+/**
+ * \brief			Controls the period of the display
+ * \param			period_us: Target period (in microseconds) for the display's cycle rate. Each frame is split into 7 sub-frames, one for each digit and one for each indicator. Valid Period is 833 us to 100,000 us.
+ */
+void Display_set_period(uint32_t period_us) {
+	if (period_us > 100000) {
+		DISPLAY_PERIOD_US = 100000;
+	} else if (period_us < 833) {
+		DISPLAY_PERIOD_US = 833;
+	} else {
+		DISPLAY_PERIOD_US = period_us;
+	}
+}
 
 /**
  * \brief			Controls the enabling of the specified digit. Digits are enumerated starting with 1 referring to the furthest left digit.
@@ -547,10 +588,10 @@ void Display_display_arbitrary(int digit, uint8_t data) {
 
 	// These need to be modified to be variable duty (variable brightness)
 	Display_enable_digit(digit);
-	k_usleep(SEGMENT_MIN_ON_TIME_US);
+	k_usleep((uint32_t) ((double)DISPLAY_PERIOD_US * DISPLAY_DUTY_CYCLE / 7.0));
 	// Display_disable_digit(digit);
 	Display_disable_all_digits();
-	k_usleep(SEGMENT_MIN_OFF_TIME_US);
+	k_usleep((uint32_t) ((double)DISPLAY_PERIOD_US * (1-DISPLAY_DUTY_CYCLE) / 7.0));
 }
 
 

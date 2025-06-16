@@ -186,7 +186,7 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
-	// Display_ALS_init(); // Only for MicroMinutes
+	Display_ALS_init(); // Only for MicroMinutes
 	Display_init(); // Only for MicroMinutes
 	Motor_init(); // Only for MicroMinutes
 
