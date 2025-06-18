@@ -47,7 +47,7 @@ static const struct gpio_dt_spec motor = GPIO_DT_SPEC_GET(MOTOR_NODE, gpios);
 
 
 static struct k_timer display_timeout;
-static struct k_timer clock_increment_timer;
+static struct k_timer motor_timeout;
 
 const k_tid_t thread_main_id;
 const k_tid_t display_thread_id;
@@ -186,7 +186,7 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
-	Display_ALS_init(); // Only for MicroMinutes
+	// Display_ALS_init(); // Only for MicroMinutes
 	Display_init(); // Only for MicroMinutes
 	Motor_init(); // Only for MicroMinutes
 
@@ -419,4 +419,15 @@ void Motor_on(void) {
 void Motor_off(void) {
 	gpio_pin_set_dt(&motor, 0);
 	// gpio_pin_configure_dt(&motor, GPIO_INPUT);
+}
+
+void Motor_vibrate(uint32_t duration_us) {
+	Motor_on();
+	k_timer_init(&motor_timeout, Motor_timeout_isr, NULL );
+	k_timer_start(&motor_timeout, K_USEC(duration_us), K_USEC(duration_us));
+}
+
+void Motor_timeout_isr(struct k_timer *dummy) {
+	Motor_off();
+	k_timer_stop(&motor_timeout);
 }

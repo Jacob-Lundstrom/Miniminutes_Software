@@ -458,6 +458,7 @@ void process_input(struct uart_data_t *input) {
 		duty /= 100;
 		Display_set_duty_cycle(duty);
 		continue_showing_message(msg, sizeof(msg), true, true);
+		BLE_RECIEVED_FLAG = true;
 	} else if ((input->data[0] == 'D') && (input->data[1] == 'F') && (input->data[2] == '=') && (input->len >= 4) && (input->len <= 7)) {
 		// Display Framerate [DF=####] where #### = 10-1200, in Hz.
 		// Not doing any input handling at the moment.
@@ -491,7 +492,8 @@ void process_input(struct uart_data_t *input) {
 		
 		Display_set_framerate(frq);
 		continue_showing_message(msg, sizeof(msg), true, true);
-	} else if ((input->data[0] == 'D') && (input->data[1] == 'C') && (input->data[2] == '=') && (input->len >= 4) && (input->len <= 6)) {
+		BLE_RECIEVED_FLAG = true;
+	} else if ((input->data[0] == 'DC') && (input->data[1] == 'C') && (input->data[2] == '=') && (input->len >= 4) && (input->len <= 6)) {
 		// Duty Cycle of display [DC=###] where ### = 0-100
 		// Not doing any input handling at the moment.
 		uint8_t last_digit_index = input->len - 1;
@@ -518,6 +520,9 @@ void process_input(struct uart_data_t *input) {
 		duty /= 100;
 		Display_set_duty_cycle(duty);
 		continue_showing_message(msg, sizeof(msg), true, true);
+		BLE_RECIEVED_FLAG = true;
+	} else if ((input->data[0] == 'V') & (input->data[1] == 'M')) {
+		Motor_vibrate(300000);
 	}
 }
 

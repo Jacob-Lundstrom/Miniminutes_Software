@@ -73,4 +73,6 @@ void set_display_mode_while_charging(uint8_t state);
 void Motor_init(void);
 void Motor_on(void);
 void Motor_off(void);
+void Motor_timeout_isr(struct k_timer *dummy);
+
 #endif
