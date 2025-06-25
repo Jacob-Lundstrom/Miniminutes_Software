@@ -57,16 +57,16 @@ const k_tid_t battery_monitor_thread_id;
 
 static bool military_time = false;
 
-K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main_DEV, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+// 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+// K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
+// 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
+K_THREAD_DEFINE(display_thread_id, 512, THREAD_display_DEV, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
 
 uint16_t RDG_DISPLAY_DEV = 0;
@@ -97,6 +97,12 @@ int THREAD_display (void) {
 				// Make sure that we do nothing if the battery is too low.
 				k_thread_suspend(display_thread_id);
 		} else {
+			static double b;
+			if (display_auto_brightness) {
+				b = (double) Display_ALS_get_brightness() / (1000.0);
+				Display_set_duty_cycle(b);
+			} 
+
 			if (show_time) {
 				uint32_t t = RTC_get_time();
 				Display_display_time_seconds(t, military_time, t % 2 );
@@ -108,6 +114,7 @@ int THREAD_display (void) {
 				Display_display_word(DISPLAY_MESSAGE, sizeof(DISPLAY_MESSAGE), show_message_green, show_message_red);
 			} else {
 				for (int i = 0; i<sizeof(DISPLAY_MESSAGE); i++) DISPLAY_MESSAGE[i] = '?';
+				// Display_ALS_disable();
 				k_thread_suspend(display_thread_id);
 			}
 		}
@@ -116,7 +123,8 @@ int THREAD_display (void) {
 
 int THREAD_display_DEV (void) {
 	while (1)
-		Display_display_word(DISPLAY_MESSAGE, sizeof(DISPLAY_MESSAGE),true, true);
+		// Display_display_word(DISPLAY_MESSAGE, sizeof(DISPLAY_MESSAGE),true, true);
+		Display_display_integer(RDG_DISPLAY_DEV, false, false);
 }
 
 void stop_display(void) {
@@ -158,6 +166,11 @@ void display_timeout_isr(struct k_timer *dummy) {
 		show_percent = false;
 		show_voltage = false;
 		show_message = false;
+		
+		need_to_enable_display_als = false;
+		need_to_disable_display_als = true;
+		
+		k_thread_resume(thread_main_id);
 	}
 	k_timer_stop(&display_timeout);
 }
@@ -186,35 +199,37 @@ void SYSTEM_init(void) {
 	show_percent = false;
 	show_voltage = false;
 
-	// Display_ALS_init(); // Only for MicroMinutes
-	Display_init(); // Only for MicroMinutes
-	Motor_init(); // Only for MicroMinutes
+	// MicroMinutes inits
+	Display_ALS_init();
+	Display_init();
+	// Motor_init();
 
-	// HR_init(); // Only for MicroFitness
-	
-	PWR_init();
-	ADC_init();
+	// MicroFitness inits
+	// HR_init();
+
+	// Always initialized
+	// PWR_init();
+	// ADC_init();
 	// IMU_init();
 
 	// RTC reset should never be needed. This will reset the clock and lose the current time.
+	// Since we want to retain the current time through a UVLO, Don't reset on start up.
 	// RTC_reset();
-	// RTC_enable_half_minute_interrupt();
-	// RTC_enable_minute_interrupt();
-	// RTC_enable_timer_interrupts();
-
 }
 
 #include "display.h"
 int THREAD_main_DEV(void) {
 
-	// SYSTEM_init();
+	SYSTEM_init();
 
-	// while(1) {
-	// 	k_msleep(1000);
-	// 	uint16_t b = Display_ALS_get_brightness();
-	// 	// if (b > 0)
-	// 		RDG_DISPLAY_DEV = b;
-	// }
+	Display_ALS_init();
+
+	while(1) {
+		k_msleep(1000);
+		int16_t b = Display_ALS_get_brightness();
+		// if (b > 0)
+			RDG_DISPLAY_DEV = b;
+	}
 
 	// TODO:
 	// Test all the functions that I wrote for the RTC
@@ -223,7 +238,6 @@ int THREAD_main_DEV(void) {
 	// This should be used as a development thread.
 	SYSTEM_init();
 	// HR_disable();
-	RTC_set_time(0, 0, 0);
 	continue_showing_time();
 
 	while(1) {
@@ -272,6 +286,7 @@ int THREAD_main(void) {
 	is_charging = PWR_get_is_on_charger();
 	// set_display_mode_while_charging(DISPLAY_PERCENT_WHILE_CHARGING);
 	set_display_mode_while_charging(DISPLAY_VOLTAGE_WHILE_CHARGING);
+	set_display_auto_brightness(true);
 	need_to_check_input = true;
 
 	while(1) {
@@ -319,8 +334,8 @@ void continue_showing_time(void){
 	show_time = true;
 	show_percent = false;
 	show_voltage = false;
-	
 	show_message = false;
+	need_to_enable_display_als = true;
 
 	resume_display();
 }
@@ -395,6 +410,10 @@ void set_display_mode_while_charging(uint8_t state) {
 	if (is_charging) {
 		display_while_charging();
 	}
+}
+
+void set_display_auto_brightness(bool tf) {
+	display_auto_brightness = tf;
 }
 
 

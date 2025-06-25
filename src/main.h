@@ -28,13 +28,15 @@ static bool show_voltage;
 static bool show_message;
 static bool show_message_green;
 static bool show_message_red;
+static bool need_to_enable_display_als;
+static bool need_to_disable_display_als;
 
 static bool always_on;
-// static bool always_on_while_charging; // Deprecated
+static bool always_on_while_charging;
 static uint8_t charging_display_mode;
 static bool is_charging;
 static bool display_thread_enabled;
-
+static bool display_auto_brightness;
 
 static int battery_mv;
 static int battery_p;
@@ -68,6 +70,7 @@ void start_BLE_thread(void);
 
 void set_always_on(bool state);
 void set_display_mode_while_charging(uint8_t state);
+void set_display_auto_brightness(bool tf);
 
 
 void Motor_init(void);
