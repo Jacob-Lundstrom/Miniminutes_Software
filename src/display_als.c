@@ -29,8 +29,10 @@ void Display_ALS_init() {
     Display_ALS_set_gain(8);
     write_to_Display_ALS(DISPLAY_ALS_REG_CONTROL, 3);
     Display_ALS_set_exposure_ms(10);
-    write_to_Display_ALS(DISPLAY_ALS_REG_INTERRUPT, 0x00); // Disables interrupts
+    // write_to_Display_ALS(DISPLAY_ALS_REG_INTERRUPT, 0x00); // Disables interrupts
     return;
+
+    
 
     // For debugging:
     // while(1) { k_msleep(500);
@@ -191,22 +193,22 @@ uint8_t Display_ALS_enable(void) {
 }
 
 uint8_t Display_ALS_disable(void) {
-    // write_to_Display_ALS(DISPLAY_ALS_REG_TIMING    , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_INTERRUPT , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_THL_LOW   , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_THL_HIGH  , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_THH_LOW   , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_THH_HIGH  , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_ANALOG    , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_ID        , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_DATA0_LOW , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_DATA0_HIGH, 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_DATA1_LOW , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_DATA1_HIGH, 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_TIMER_LOW , 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_TIMER_HIGH, 0x00);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_ID2       , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_TIMING    , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_INTERRUPT , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THL_LOW   , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THL_HIGH  , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THH_LOW   , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_THH_HIGH  , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_ANALOG    , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_ID        , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_DATA0_LOW , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_DATA0_HIGH, 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_DATA1_LOW , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_DATA1_HIGH, 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_TIMER_LOW , 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_TIMER_HIGH, 0x00);
+    write_to_Display_ALS(DISPLAY_ALS_REG_ID2       , 0x00);
 
-    // write_to_Display_ALS(DISPLAY_ALS_REG_CONTROL, 0x00); // Power down
+    write_to_Display_ALS(DISPLAY_ALS_REG_CONTROL, 0x00); // Power down
     // Now there should be no difference between a power cycle and a "disable"
 }

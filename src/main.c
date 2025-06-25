@@ -57,16 +57,16 @@ const k_tid_t battery_monitor_thread_id;
 
 static bool military_time = false;
 
-K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main_DEV, NULL, NULL, NULL,
+K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-// 		PRIORITY, 0, 0);
+K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
 
-// K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
-// 		PRIORITY, 0, 0);
+K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(display_thread_id, 512, THREAD_display_DEV, NULL, NULL, NULL,
+K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
 
 uint16_t RDG_DISPLAY_DEV = 0;
@@ -81,7 +81,15 @@ int THREAD_battery_monitor (void) {
 			battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
 			PWR_reconnect_to_charger();
 		} else {
+			k_msleep(100);if (is_charging) {
+			PWR_disconnect_from_charger();
+			k_msleep(100); // Wait for the voltage on the cap to stabilize
+			battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
+			PWR_reconnect_to_charger();
+		} else {
 			k_msleep(100);
+			battery_mv = read_battery_voltage();
+		}
 			battery_mv = read_battery_voltage();
 		}
 		battery_p = get_battery_percentage(battery_mv);
@@ -114,8 +122,11 @@ int THREAD_display (void) {
 				Display_display_word(DISPLAY_MESSAGE, sizeof(DISPLAY_MESSAGE), show_message_green, show_message_red);
 			} else {
 				for (int i = 0; i<sizeof(DISPLAY_MESSAGE); i++) DISPLAY_MESSAGE[i] = '?';
-				// Display_ALS_disable();
+				Display_ALS_disable();
 				k_thread_suspend(display_thread_id);
+				// the display will always start at this line on every resume.
+				Display_ALS_enable();
+				k_msleep(20);
 			}
 		}
 	}
@@ -167,10 +178,6 @@ void display_timeout_isr(struct k_timer *dummy) {
 		show_voltage = false;
 		show_message = false;
 		
-		need_to_enable_display_als = false;
-		need_to_disable_display_als = true;
-		
-		k_thread_resume(thread_main_id);
 	}
 	k_timer_stop(&display_timeout);
 }
@@ -200,17 +207,16 @@ void SYSTEM_init(void) {
 	show_voltage = false;
 
 	// MicroMinutes inits
-	Display_ALS_init();
 	Display_init();
-	// Motor_init();
+	Motor_init();
 
 	// MicroFitness inits
 	// HR_init();
 
 	// Always initialized
-	// PWR_init();
-	// ADC_init();
-	// IMU_init();
+	PWR_init();
+	ADC_init();
+	IMU_init();
 
 	// RTC reset should never be needed. This will reset the clock and lose the current time.
 	// Since we want to retain the current time through a UVLO, Don't reset on start up.
@@ -288,6 +294,12 @@ int THREAD_main(void) {
 	set_display_mode_while_charging(DISPLAY_VOLTAGE_WHILE_CHARGING);
 	set_display_auto_brightness(true);
 	need_to_check_input = true;
+
+	// Do the same thing that the battery monitor thread would do.
+		battery_mv = read_battery_voltage();
+	
+	k_thread_resume(display_thread_id); // Properly start the display thread once the ADC recorded the "battery" voltage
+	// This is required to ensure that the ALS will start up on the first display event.
 
 	while(1) {
 		if (need_to_check_input) {
