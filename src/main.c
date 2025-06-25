@@ -123,6 +123,7 @@ int THREAD_display (void) {
 			} else {
 				for (int i = 0; i<sizeof(DISPLAY_MESSAGE); i++) DISPLAY_MESSAGE[i] = '?';
 				Display_ALS_disable();
+				Display_sleep();
 				k_thread_suspend(display_thread_id);
 				// the display will always start at this line on every resume.
 				Display_ALS_enable();
@@ -160,6 +161,7 @@ void continue_check_input(void) {
 }
 
 void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
+	read_from_IMU(0x24); // Read and clear interrupt flags
 	if (show_time || show_percent || show_voltage || show_message){
 		return;
 	} else {
@@ -177,7 +179,6 @@ void display_timeout_isr(struct k_timer *dummy) {
 		show_percent = false;
 		show_voltage = false;
 		show_message = false;
-		
 	}
 	k_timer_stop(&display_timeout);
 }
@@ -403,8 +404,9 @@ void set_military_time(bool status) {
 }
 
 void simulate_IMU_interrupt(void) {
-	continue_showing_time();
+	// continue_showing_time();
 	// PWR_wakeup_isr(NULL, NULL, 0);
+	IMU_wakeup_isr(NULL, NULL, 0);
 }
 
 void set_always_on(bool state) {

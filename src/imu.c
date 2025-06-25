@@ -55,19 +55,16 @@ void IMU_init(void) {
 		return 0;
 	}
 
-	// These next two steps drastically increase the current draw?
-	// May have something to do with the push-pull nature of the IMU.
-	// Don't do these for now, it still works.
 	
-	// ret = gpio_pin_configure_dt(&INT1, GPIO_PULL_UP);
-	// if (ret < 0) {
-	// 	return 0;
-	// }
+	ret = gpio_pin_configure_dt(&INT1, GPIO_PULL_UP);
+	if (ret < 0) {
+		return 0;
+	}
 	
-	// ret = gpio_pin_configure_dt(&INT1, GPIO_INPUT);
-	// if (ret < 0) {
-	// 	return 0;
-	// }
+	ret = gpio_pin_configure_dt(&INT1, GPIO_INPUT);
+	if (ret < 0) {
+		return 0;
+	}
 	
 	ret = gpio_pin_interrupt_configure_dt(&INT1,GPIO_INT_EDGE_TO_ACTIVE);
 	if (ret < 0) {
@@ -112,7 +109,7 @@ void IMU_init(void) {
 
 	write_to_IMU(0x17, 0b00000001);
 
-	// write_to_IMU(0x0C, 0b00111110); // Configures pulling resistors, sets interrupt level, sets open-drain on INT1
+	write_to_IMU(0x0C, 0b00111110); // Configures pulling resistors, sets interrupt level, sets open-drain on INT1
 	write_to_IMU(0x14, 0b10100010); // ODR 400 Hz, 8G FS
 	write_to_IMU(0x12, 0b00000000); // HP disabled
 

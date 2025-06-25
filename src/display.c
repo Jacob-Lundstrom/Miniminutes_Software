@@ -233,30 +233,6 @@ void Display_disable_all_digits() {
 	gpio_pin_configure_dt(&CA3, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA4, GPIO_INPUT);
 	gpio_pin_configure_dt(&CA5, GPIO_INPUT);
-	
-	// gpio_pin_set_dt(&CA5, 1);
-	// gpio_pin_set_dt(&CA4, 1);
-	// gpio_pin_set_dt(&CA3, 1);
-	// gpio_pin_set_dt(&CA2, 1);
-	// gpio_pin_set_dt(&CA1, 1);
-
-	// Doing this massively reduces the quiescent current draw (by hundreds of uA).
-	// I think this has something to do with GPIO leakage?
-	gpio_pin_set_dt(&CC7, 1);
-	gpio_pin_set_dt(&CC6, 1);
-	gpio_pin_set_dt(&CC5, 1);
-	gpio_pin_set_dt(&CC4, 1);
-	gpio_pin_set_dt(&CC3, 1);
-	gpio_pin_set_dt(&CC2, 1);
-	gpio_pin_set_dt(&CC1, 1);
-	
-	// gpio_pin_configure_dt(&CC1, GPIO_INPUT);
-	// gpio_pin_configure_dt(&CC2, GPIO_INPUT);
-	// gpio_pin_configure_dt(&CC3, GPIO_INPUT);
-	// gpio_pin_configure_dt(&CC4, GPIO_INPUT);
-	// gpio_pin_configure_dt(&CC5, GPIO_INPUT);
-	// gpio_pin_configure_dt(&CC6, GPIO_INPUT);
-	// gpio_pin_configure_dt(&CC7, GPIO_INPUT);
 }
 
 
@@ -562,6 +538,8 @@ uint8_t Display_convert_character_to_segments(uint8_t character) {
  * \param			data: Data corresponding to the configuration to be displayed. Bits 7-1 correspond to segments G-A, respectively. Bit 0 is used to enable an indication LED, if it is associated with the display digit. Otherwise, bit 0 does nothing.
  */
 void Display_display_arbitrary(int digit, uint8_t data) {
+	
+	Display_disable_digit(digit);
 
 	uint8_t out_states = 0xFF - data;
 	gpio_pin_set_dt(&CC7, ((out_states >> 7) & 1));
@@ -663,4 +641,32 @@ void Display_display_integer(uint16_t integer, bool green_ind, bool red_ind) {
 		// Display_display_error(99);
 		return;
 	}
+}
+
+/**
+ * \brief			Changes all of the digits of the display to a low-power state.
+ */
+void Display_sleep() {
+	
+	// I have no idea why this works so much better than trying to set all the pin states alone... but if it works it works I guess.
+	Display_init();
+
+
+	
+	// This doesn't work very well. Still has several hundreds of uA quiescent
+	
+	// gpio_pin_set_dt(&CA5, 0);
+	// gpio_pin_set_dt(&CA4, 0);
+	// gpio_pin_set_dt(&CA3, 0);
+	// gpio_pin_set_dt(&CA2, 0);
+	// gpio_pin_set_dt(&CA1, 0);
+
+	// gpio_pin_set_dt(&CC7, 1);
+	// gpio_pin_set_dt(&CC6, 1);
+	// gpio_pin_set_dt(&CC5, 1);
+	// gpio_pin_set_dt(&CC4, 1);
+	// gpio_pin_set_dt(&CC3, 1);
+	// gpio_pin_set_dt(&CC2, 1);
+	// gpio_pin_set_dt(&CC1, 1);
+	
 }
