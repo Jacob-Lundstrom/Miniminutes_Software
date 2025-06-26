@@ -38,5 +38,8 @@ uint8_t Display_ALS_check_ID(void);
 uint8_t Display_ALS_set_exposure_ms(float exposure_ms);
 uint8_t Display_ALS_set_gain(uint8_t gain);
 
+uint8_t Display_ALS_check_interrupts();
+uint8_t Display_ALS_clear_interrupts();
+
 uint8_t Display_ALS_enable(void);
 uint8_t Display_ALS_disable(void);

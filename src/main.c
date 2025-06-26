@@ -52,7 +52,7 @@ static struct k_timer motor_timeout;
 const k_tid_t thread_main_id;
 const k_tid_t display_thread_id;
 const k_tid_t battery_monitor_thread_id;
-#define MAIN_STACKSIZE 512*16
+#define MAIN_STACKSIZE 512*32
 #define PRIORITY 7
 
 static bool military_time = false;
@@ -74,14 +74,8 @@ char DISPLAY_MESSAGE[5] = {'?','?','?','?','?'};
 
 int THREAD_battery_monitor (void) {
 	while(1) {
-		k_msleep(9900);
+		k_msleep(900);
 		if (is_charging) {
-			PWR_disconnect_from_charger();
-			k_msleep(100); // Wait for the voltage on the cap to stabilize
-			battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
-			PWR_reconnect_to_charger();
-		} else {
-			k_msleep(100);if (is_charging) {
 			PWR_disconnect_from_charger();
 			k_msleep(100); // Wait for the voltage on the cap to stabilize
 			battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
@@ -90,9 +84,8 @@ int THREAD_battery_monitor (void) {
 			k_msleep(100);
 			battery_mv = read_battery_voltage();
 		}
-			battery_mv = read_battery_voltage();
-		}
 		battery_p = get_battery_percentage(battery_mv);
+		continue_check_input(); // This makes sure that we check that no interrupts occurred while measuring the battery
 	}
 }
 
@@ -105,12 +98,6 @@ int THREAD_display (void) {
 				// Make sure that we do nothing if the battery is too low.
 				k_thread_suspend(display_thread_id);
 		} else {
-			static double b;
-			if (display_auto_brightness) {
-				b = (double) Display_ALS_get_brightness() / (1000.0);
-				Display_set_duty_cycle(b);
-			} 
-
 			if (show_time) {
 				uint32_t t = RTC_get_time();
 				Display_display_time_seconds(t, military_time, t % 2 );
@@ -127,7 +114,6 @@ int THREAD_display (void) {
 				k_thread_suspend(display_thread_id);
 				// the display will always start at this line on every resume.
 				Display_ALS_enable();
-				k_msleep(20);
 			}
 		}
 	}
@@ -151,25 +137,20 @@ void stop_display(void) {
 
 void continue_check_input(void) {
 	need_to_check_input = true;
-	
-	show_time = false;
-	show_percent = false;
-	show_voltage = false;
-	show_message = false;
-	
 	resume_main_thread();
 }
 
 void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
-	read_from_IMU(0x24); // Read and clear interrupt flags
-	if (show_time || show_percent || show_voltage || show_message){
+	need_to_check_IMU = true;
+	resume_main_thread();
+	if (show_time | show_percent | show_voltage | show_message){
 		return;
 	} else {
 		continue_showing_time();
 	}
 }
 
-void PWR_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
+void common_interrupt_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
 	continue_check_input();
 }
 
@@ -181,11 +162,6 @@ void display_timeout_isr(struct k_timer *dummy) {
 		show_message = false;
 	}
 	k_timer_stop(&display_timeout);
-}
-
-void configure_timers(void) {	
-	k_timer_init(&display_timeout, display_timeout_isr, NULL );
-	k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
 }
 
 void display_while_charging(void) {
@@ -278,12 +254,6 @@ int THREAD_main(void) {
 	// - Check all modes for full functionality
 	// - Implement OTA updates
 	// - Add Step counting
-	// - Add timer setting functionality (alarms)
-	// - Suspension of BLE thread when powered down
-	// - Further improvements of power consumptino when powered down
-	// - Perform burn-out tests on eahc color of LED
-	// - Finish next board revision, place order
-	// 		- Add vibration functionality, fix IMU problem
 
 	SYSTEM_init();		
 
@@ -304,23 +274,36 @@ int THREAD_main(void) {
 
 	while(1) {
 		if (need_to_check_input) {
-			// is_charging = PWR_get_is_on_charger();
-			// bool rtc_alarm_flag = RTC_check_alarm_flag();
-			// bool rtc_timer_flag = RTC_check_timer_flag();
-			is_charging = 0;
-			bool rtc_alarm_flag = false;
-			bool rtc_timer_flag = false;
+			is_charging 			= PWR_get_is_on_charger();
+			bool rtc_alarm_flag 	= RTC_check_alarm_flag();
+			bool rtc_timer_flag 	= RTC_check_timer_flag();
+			bool disp_als_int_flag 	= Display_ALS_check_interrupts();
+			need_to_check_input = false; // At this point we should know which source the interrupt came from
 
+			if (disp_als_int_flag) {
+				static double b;
+				if (display_auto_brightness) {
+					b = (double) Display_ALS_get_brightness() / (1000.0);
+					if (b > 0) Display_set_duty_cycle(b);
+				}
+				Display_ALS_clear_interrupts();
+				disp_als_int_flag = false;
+			}
+			Display_ALS_clear_interrupts(); // There's a glitch sometimes where the ALS gets stuck low... This fixes it?
 
-			need_to_check_input = false;
 			if (rtc_alarm_flag) {
 				continue_showing_time();
-			} else if (rtc_timer_flag) {
+			}
+
+			if (rtc_timer_flag) {
 				continue_showing_time();
 			}
+
 			if (is_charging) display_while_charging();
 			
-			k_msleep(100);
+		} else if (need_to_check_IMU) {
+			read_from_IMU(0x24);
+			need_to_check_IMU = false;			
 		} else {
 			k_thread_suspend(thread_main_id);
 		}
@@ -337,9 +320,6 @@ void resume_display(void) {
 }
 
 void resume_main_thread(void) {
-	k_timer_stop(&display_timeout);
-	k_timer_init(&display_timeout, display_timeout_isr, NULL);
-	k_timer_start(&display_timeout, K_SECONDS(5), K_SECONDS(5));
 	k_thread_resume(thread_main_id);
 }
 
@@ -348,7 +328,6 @@ void continue_showing_time(void){
 	show_percent = false;
 	show_voltage = false;
 	show_message = false;
-	need_to_enable_display_als = true;
 
 	resume_display();
 }
@@ -357,7 +336,6 @@ void continue_showing_battery_percent(void){
 	show_time = false;
 	show_percent = true;
 	show_voltage = false;
-
 	show_message = false;
 
 	resume_display();
@@ -404,8 +382,6 @@ void set_military_time(bool status) {
 }
 
 void simulate_IMU_interrupt(void) {
-	// continue_showing_time();
-	// PWR_wakeup_isr(NULL, NULL, 0);
 	IMU_wakeup_isr(NULL, NULL, 0);
 }
 

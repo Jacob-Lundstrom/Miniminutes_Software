@@ -29,7 +29,7 @@ void Display_ALS_init() {
     Display_ALS_set_gain(8);
     write_to_Display_ALS(DISPLAY_ALS_REG_CONTROL, 3);
     Display_ALS_set_exposure_ms(10);
-    // write_to_Display_ALS(DISPLAY_ALS_REG_INTERRUPT, 0x00); // Disables interrupts
+    k_msleep(3);
     return;
 
     
@@ -184,6 +184,14 @@ uint8_t Display_ALS_set_gain(uint8_t gain) {
         }
     }
     return write_to_Display_ALS(DISPLAY_ALS_REG_ANALOG, data);
+}
+
+uint8_t Display_ALS_check_interrupts() {
+    return read_from_Display_ALS(0x00) & (0b1 << 5);
+}
+
+uint8_t Display_ALS_clear_interrupts() {
+    command_Display_ALS(0b11100001);
 }
 
 

@@ -100,7 +100,7 @@ int PWR_init(void) {
 	if (ret < 0) {
 		return 0;
 	}
-	gpio_init_callback(&chrg_stat_pin_cb_data, PWR_wakeup_isr, BIT(CHRG_RTC_INT.pin));
+	gpio_init_callback(&chrg_stat_pin_cb_data, common_interrupt_isr, BIT(CHRG_RTC_INT.pin));
 	ret = gpio_add_callback(CHRG_RTC_INT.port, &chrg_stat_pin_cb_data);
 
 	if (ret != 0) {
