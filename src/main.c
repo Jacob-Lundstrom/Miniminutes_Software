@@ -9,15 +9,6 @@
 
 #include "main.h"
 
-#define ALARM_CHANNEL_ID 0
-#define TIMER DT_NODELABEL(rtc0)
-
-
-
-static struct k_timer display_timeout;
-
-static bool military_time = false;
-
 const k_tid_t thread_main_id;
 const k_tid_t display_thread_id;
 const k_tid_t battery_monitor_thread_id;
@@ -25,8 +16,8 @@ const k_tid_t battery_monitor_thread_id;
 K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-// 		PRIORITY, 0, 0);
+K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+		PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
