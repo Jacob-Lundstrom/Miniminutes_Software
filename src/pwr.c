@@ -126,6 +126,8 @@ int PWR_init(void) {
 
 	write_to_pwr(0x0C, 0b11100000); // Enables only necessary PG / VINOVP interrupt
 
+	 
+
 	return 1;
 }
 
@@ -150,7 +152,7 @@ int PWR_reconnect_to_charger(void) {
  * \return		1 if VIN present, 0 otherwise.
  */
 bool PWR_get_is_on_charger(void) {
-	return (read_from_pwr(0x00 * 0b1)); // VIN Power good
+	return (read_from_pwr(0x00) * 0b1); // VIN Power good
 }
 
 /**
@@ -167,7 +169,7 @@ uint8_t PWR_get_charge_status(void) {
  */
 uint32_t read_battery_voltage(void) {
 	uint32_t avg = 0;
-	int rdgs = 100;
+	int rdgs = 300;
 
 	int err = 0;
 	// err = PWR_disconnect_from_charger();
@@ -176,20 +178,14 @@ uint32_t read_battery_voltage(void) {
 	}
 
 	// BEGIN MODIFICATION FOR LOAD SWITCH
-	int ret;
 	
 	// I have to do this for some reason? I think its because setting pull-up to this pin changes it to open drain config for output.
-	ret = gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_PIN_CNF_PULL_Disabled); 
-
-	ret += gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_OPEN_DRAIN);
-	ret += gpio_pin_set_dt(&CHRG_RTC_INT, 1); 
-	ret += gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_OUTPUT);
+	gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_PIN_CNF_PULL_Disabled); 
+	gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_OPEN_DRAIN);
+	gpio_pin_set_dt(&CHRG_RTC_INT, 1); 
+	gpio_pin_configure_dt(&CHRG_RTC_INT, GPIO_OUTPUT);
 
 	k_msleep(30);
-
-	if (ret < 0) {
-		Display_display_error(33);
-	}
 	// END MODIFICATION FOR LOAD SWITCH
 
 	// printk("ADC reading[%u]:\n", count++);

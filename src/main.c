@@ -7,61 +7,18 @@
 // THIS PROGRAM REQUIRES nRF Connect SDK v2.6.1
 // I don't think that the toolchain version matters.
 
-
-#include <zephyr/kernel.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/i2c.h>
-#include <zephyr/drivers/adc.h>
-#include <nrfx_timer.h>
-
-#include <nrfx_clock.h>
-#include <nrfx_rtc.h>
-
-#include <zephyr/device.h>
-#include <zephyr/sys/printk.h>
-
-#include <zephyr/kernel/thread_stack.h>
-
-#include <zephyr/sys/poweroff.h>
-#include <hal/nrf_power.h>
-
 #include "main.h"
-#include "display.h"
-#include "imu.h"
-#include "bluetooth.h"
-#include "pwr.h"
-#include "hr.h"
-#include "rtc.h"
-#include "display_als.h"
 
-#define LOG_LEVEL LOG_LEVEL_DBG
-#include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(smp_sample);
-
-#define ALARM_CHANNEL_ID 0
-#define TIMER DT_NODELABEL(rtc0)
-
-
-#define MOTOR_NODE DT_ALIAS(motorenable)
-static const struct gpio_dt_spec motor = GPIO_DT_SPEC_GET(MOTOR_NODE, gpios);
-
-
-static struct k_timer display_timeout;
-static struct k_timer motor_timeout;
 
 const k_tid_t thread_main_id;
 const k_tid_t display_thread_id;
 const k_tid_t battery_monitor_thread_id;
-#define MAIN_STACKSIZE 512*32
-#define PRIORITY 7
-
-static bool military_time = false;
 
 K_THREAD_DEFINE(thread_main_id, MAIN_STACKSIZE, THREAD_main, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
+// K_THREAD_DEFINE(ble_thread_id, 2 * BLE_STACKSIZE, BLE_init, NULL, NULL, NULL,
+// 		PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NULL, NULL,
 		PRIORITY, 0, 0);
@@ -69,30 +26,23 @@ K_THREAD_DEFINE(battery_monitor_thread_id, 512, THREAD_battery_monitor, NULL, NU
 K_THREAD_DEFINE(display_thread_id, 512, THREAD_display, NULL, NULL, NULL,
 	PRIORITY, 0, 0);
 
-uint16_t RDG_DISPLAY_DEV = 0;
-char DISPLAY_MESSAGE[5] = {'?','?','?','?','?'};
-
+	
 int THREAD_battery_monitor (void) {
 	while(1) {
-		k_msleep(900);
-		if (is_charging) {
-			PWR_disconnect_from_charger();
-			k_msleep(100); // Wait for the voltage on the cap to stabilize
-			battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
-			PWR_reconnect_to_charger();
-		} else {
-			k_msleep(100);
-			battery_mv = read_battery_voltage();
+		k_msleep(500);
+		if (display_thread_id->base.thread_state & _THREAD_SUSPENDED) {
+			k_msleep(9500);
 		}
+
+		battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
+		if (PWR_get_is_on_charger()) battery_mv -= 225;
+
 		battery_p = get_battery_percentage(battery_mv);
-		continue_check_input(); // This makes sure that we check that no interrupts occurred while measuring the battery
+		continue_check_common_interrupt(); // This makes sure that we check that no interrupts occurred while measuring the battery
 	}
 }
 
-
 int THREAD_display (void) {
-	extern bool BLE_RECIEVED_FLAG;
-
 	while(true) {
 		if ((battery_mv < BATTERY_MIN_VOLTAGE_MV)){
 				// Make sure that we do nothing if the battery is too low.
@@ -100,7 +50,7 @@ int THREAD_display (void) {
 		} else {
 			if (show_time) {
 				uint32_t t = RTC_get_time();
-				Display_display_time_seconds(t, military_time, t % 2 );
+				// Display_display_time_seconds(t, military_time, t % 2 );
 			} else if (show_percent) {
 				Display_display_percent(battery_p);
 			} else if (show_voltage) {
@@ -125,103 +75,9 @@ int THREAD_display_DEV (void) {
 		Display_display_integer(RDG_DISPLAY_DEV, false, false);
 }
 
-void stop_display(void) {
-	need_to_check_input = false;
-	show_time = false;
-	show_percent = false;
-	show_voltage = false;
-	show_message = false;
-
-	display_timeout_isr(NULL);
-}
-
-void continue_check_input(void) {
-	need_to_check_input = true;
-	resume_main_thread();
-}
-
-void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
-	need_to_check_IMU = true;
-	resume_main_thread();
-	if (show_time | show_percent | show_voltage | show_message){
-		return;
-	} else {
-		continue_showing_time();
-	}
-}
-
-void common_interrupt_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
-	continue_check_input();
-}
-
-void display_timeout_isr(struct k_timer *dummy) {
-	if (!(always_on || (charging_display_mode && is_charging))) {
-		show_time = false;
-		show_percent = false;
-		show_voltage = false;
-		show_message = false;
-	}
-	k_timer_stop(&display_timeout);
-}
-
-void display_while_charging(void) {
-	if (is_charging) {
-		if (charging_display_mode == DISPLAY_NOTHING_WHILE_CHARGING) stop_display();
-		if (charging_display_mode == DISPLAY_PERCENT_WHILE_CHARGING) continue_showing_battery_percent();
-		if (charging_display_mode == DISPLAY_VOLTAGE_WHILE_CHARGING) continue_showing_battery_voltage();
-		if (charging_display_mode == DISPLAY_TIME_WHILE_CHARGING) continue_showing_time();
-		if (charging_display_mode == DISPLAY_TIME_AND_PERCENT_WHILE_CHARGING) return; // unimplemented at the moment
-	}
-}
-
-void SYSTEM_init(void) {
-
-	need_to_check_input = true; // On startup, see if the device is on the charger
-
-	// Assume that it is not charging
-	show_time = false;
-	show_percent = false;
-	show_voltage = false;
-
-	// MicroMinutes inits
-	Display_init();
-	Motor_init();
-
-	// MicroFitness inits
-	// HR_init();
-
-	// Always initialized
-	PWR_init();
-	ADC_init();
-	IMU_init();
-
-	// RTC reset should never be needed. This will reset the clock and lose the current time.
-	// Since we want to retain the current time through a UVLO, Don't reset on start up.
-	// RTC_reset();
-}
-
-#include "display.h"
 int THREAD_main_DEV(void) {
 
 	SYSTEM_init();
-
-	Display_ALS_init();
-
-	while(1) {
-		k_msleep(1000);
-		int16_t b = Display_ALS_get_brightness();
-		// if (b > 0)
-			RDG_DISPLAY_DEV = b;
-	}
-
-	// TODO:
-	// Test all the functions that I wrote for the RTC
-	// Write a processing algorithm that measures heart rate
-	// Write the handling funcitons that allow for saving to flash
-	// This should be used as a development thread.
-	SYSTEM_init();
-	// HR_disable();
-	continue_showing_time();
 
 	while(1) {
 		k_msleep(100);
@@ -261,24 +117,23 @@ int THREAD_main(void) {
 	k_msleep(1000); // wait for the other threads to finish initializing before starting
 
 	is_charging = PWR_get_is_on_charger();
-	// set_display_mode_while_charging(DISPLAY_PERCENT_WHILE_CHARGING);
 	set_display_mode_while_charging(DISPLAY_VOLTAGE_WHILE_CHARGING);
 	set_display_auto_brightness(true);
-	need_to_check_input = true;
+	need_to_check_interrupt_source = true;
 
 	// Do the same thing that the battery monitor thread would do.
-		battery_mv = read_battery_voltage();
+	battery_mv = read_battery_voltage();
 	
 	k_thread_resume(display_thread_id); // Properly start the display thread once the ADC recorded the "battery" voltage
 	// This is required to ensure that the ALS will start up on the first display event.
 
 	while(1) {
-		if (need_to_check_input) {
+		if (need_to_check_interrupt_source) {
 			is_charging 			= PWR_get_is_on_charger();
 			bool rtc_alarm_flag 	= RTC_check_alarm_flag();
 			bool rtc_timer_flag 	= RTC_check_timer_flag();
 			bool disp_als_int_flag 	= Display_ALS_check_interrupts();
-			need_to_check_input = false; // At this point we should know which source the interrupt came from
+			need_to_check_interrupt_source 	= false; // At this point we should know which source the interrupt came from
 
 			if (disp_als_int_flag) {
 				static double b;
@@ -301,15 +156,85 @@ int THREAD_main(void) {
 
 			if (is_charging) display_while_charging();
 			
-		} else if (need_to_check_IMU) {
-			read_from_IMU(0x24);
-			need_to_check_IMU = false;			
-		} else {
-			k_thread_suspend(thread_main_id);
-		}
+		} 
+		
+		if (need_to_check_IMU_interrupt) {
+			uint8_t int_src = read_from_IMU(0x24);
+			if (int_src) { // If the wakeup source was double tap, show time.
+				continue_showing_time();
+			}
+			need_to_check_IMU_interrupt = false;			
+		} 
+		
+		k_thread_suspend(thread_main_id);
 	}
 
 	return 0;
+}
+
+void stop_display(void) {
+	need_to_check_interrupt_source = false;
+	show_time = false;
+	show_percent = false;
+	show_voltage = false;
+	show_message = false;
+
+	display_timeout_isr(NULL);
+}
+
+void IMU_interrupt_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
+	need_to_check_IMU_interrupt = true;
+	resume_main_thread();
+}
+
+void common_interrupt_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
+	continue_check_common_interrupt();
+}
+
+void display_timeout_isr(struct k_timer *dummy) {
+	if (!(always_on || (charging_display_mode && is_charging))) {
+		show_time = false;
+		show_percent = false;
+		show_voltage = false;
+		show_message = false;
+	}
+	k_timer_stop(&display_timeout);
+}
+
+void display_while_charging(void) {
+	if (is_charging) {
+		if (charging_display_mode == DISPLAY_NOTHING_WHILE_CHARGING) stop_display();
+		if (charging_display_mode == DISPLAY_PERCENT_WHILE_CHARGING) continue_showing_battery_percent();
+		if (charging_display_mode == DISPLAY_VOLTAGE_WHILE_CHARGING) continue_showing_battery_voltage();
+		if (charging_display_mode == DISPLAY_TIME_WHILE_CHARGING) continue_showing_time();
+		if (charging_display_mode == DISPLAY_TIME_AND_PERCENT_WHILE_CHARGING) return; // unimplemented at the moment
+	}
+}
+
+void SYSTEM_init(void) {
+
+	need_to_check_interrupt_source = true; // On startup, see if the device is on the charger
+
+	// Assume that it is not charging
+	show_time = false;
+	show_percent = false;
+	show_voltage = false;
+
+	// MicroMinutes inits
+	Display_init();
+	Motor_init();
+
+	// MicroFitness inits
+	// HR_init();
+
+	// Always initialized
+	PWR_init();
+	ADC_init();
+	IMU_init();
+
+	// RTC reset should never be needed. This will reset the clock and lose the current time.
+	// Since we want to retain the current time through a UVLO, Don't reset on start up.
+	// RTC_reset();
 }
 
 void resume_display(void) {
@@ -321,6 +246,11 @@ void resume_display(void) {
 
 void resume_main_thread(void) {
 	k_thread_resume(thread_main_id);
+}
+
+void continue_check_common_interrupt(void) {
+	need_to_check_interrupt_source = true;
+	resume_main_thread();
 }
 
 void continue_showing_time(void){
@@ -345,7 +275,6 @@ void continue_showing_battery_voltage(void){
 	show_time = false;
 	show_percent = false;
 	show_voltage = true;
-
 	show_message = false;
 
 	resume_display();
@@ -381,10 +310,6 @@ void set_military_time(bool status) {
 	continue_showing_time();
 }
 
-void simulate_IMU_interrupt(void) {
-	IMU_wakeup_isr(NULL, NULL, 0);
-}
-
 void set_always_on(bool state) {
 	// This function should be used mostly for development only.
 	always_on = state;
@@ -402,10 +327,15 @@ void set_display_mode_while_charging(uint8_t state) {
 	}
 }
 
-void set_display_auto_brightness(bool tf) {
-	display_auto_brightness = tf;
+void set_display_auto_brightness(bool state) {
+	display_auto_brightness = state;
 }
 
+void simulate_IMU_interrupt(void) {
+	continue_showing_time();
+}
+
+// MOTOR FUNCTIONS
 
 void Motor_init(void) {
 	if (!gpio_is_ready_dt(&motor)) {

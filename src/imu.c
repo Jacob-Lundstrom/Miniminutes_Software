@@ -70,7 +70,7 @@ void IMU_init(void) {
 	if (ret < 0) {
 		return 0;
 	}
-	gpio_init_callback(&pin_cb_data, IMU_wakeup_isr, BIT(INT1.pin));
+	gpio_init_callback(&pin_cb_data, IMU_interrupt_isr, BIT(INT1.pin));
 	gpio_add_callback(INT1.port, &pin_cb_data);
 
 

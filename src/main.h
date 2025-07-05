@@ -4,14 +4,38 @@
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
+#include <zephyr/drivers/adc.h>
 #include <nrfx_timer.h>
 
 #include <nrfx_clock.h>
 #include <nrfx_rtc.h>
 
 #include <zephyr/device.h>
-#include <zephyr/drivers/counter.h>
 #include <zephyr/sys/printk.h>
+
+#include <zephyr/kernel/thread_stack.h>
+
+#include <zephyr/sys/poweroff.h>
+#include <hal/nrf_power.h>
+
+#include "display.h"
+#include "imu.h"
+#include "bluetooth.h"
+#include "pwr.h"
+#include "hr.h"
+#include "rtc.h"
+
+#define MOTOR_NODE DT_ALIAS(motorenable)
+static const struct gpio_dt_spec motor = GPIO_DT_SPEC_GET(MOTOR_NODE, gpios);
+
+static struct k_timer display_timeout;
+static struct k_timer motor_timeout;
+
+#define MAIN_STACKSIZE 512*32
+#define PRIORITY 7
+
+static uint16_t RDG_DISPLAY_DEV = 0;
+static char DISPLAY_MESSAGE[5] = {'?','?','?','?','?'};
 
 #define DISPLAY_NOTHING_WHILE_CHARGING 0
 #define DISPLAY_PERCENT_WHILE_CHARGING 1
@@ -20,8 +44,8 @@
 #define DISPLAY_TIME_AND_PERCENT_WHILE_CHARGING 4
 // Add more display charging modes here
 
-static bool need_to_check_input;
-static bool need_to_check_IMU;
+static bool need_to_check_interrupt_source;
+static bool need_to_check_IMU_interrupt;
 static bool show_time;
 static bool show_percent;
 static bool show_voltage;
@@ -38,6 +62,7 @@ static uint8_t charging_display_mode;
 static bool is_charging;
 static bool display_thread_enabled;
 static bool display_auto_brightness;
+static bool military_time;
 
 static int battery_mv;
 static int battery_p;
@@ -58,7 +83,7 @@ void continue_showing_message(char *msg, uint8_t length, bool green_status, bool
 void set_time(uint32_t time);
 void set_military_time(bool status);
 
-void IMU_wakeup_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
+void IMU_interrupt_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
 void common_interrupt_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
 void display_timeout_isr(struct k_timer *dummy);
 

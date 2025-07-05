@@ -196,7 +196,6 @@ uint8_t Display_ALS_clear_interrupts() {
 
 
 uint8_t Display_ALS_enable(void) {
-    // write_to_Display_ALS(DISPLAY_ALS_REG_CONTROL, read_from_Display_ALS(DISPLAY_ALS_REG_CONTROL) | (0b00000010));
     Display_ALS_init();
 }
 
