@@ -9,6 +9,14 @@
 
 #include "main.h"
 
+#define ALARM_CHANNEL_ID 0
+#define TIMER DT_NODELABEL(rtc0)
+
+
+
+static struct k_timer display_timeout;
+
+static bool military_time = false;
 
 const k_tid_t thread_main_id;
 const k_tid_t display_thread_id;
@@ -31,7 +39,7 @@ int THREAD_battery_monitor (void) {
 	while(1) {
 		k_msleep(500);
 		if (display_thread_id->base.thread_state & _THREAD_SUSPENDED) {
-			k_msleep(9500);
+			// k_msleep(9500); // This isn't working right for some reason. The increased duration is always active.
 		}
 
 		battery_mv = read_battery_voltage(); // With battery tracking mode, the voltage on SYS is about 0.225 V higher than the battery.
@@ -50,7 +58,7 @@ int THREAD_display (void) {
 		} else {
 			if (show_time) {
 				uint32_t t = RTC_get_time();
-				// Display_display_time_seconds(t, military_time, t % 2 );
+				Display_display_time_seconds(t, military_time, t % 2 );
 			} else if (show_percent) {
 				Display_display_percent(battery_p);
 			} else if (show_voltage) {
@@ -160,7 +168,7 @@ int THREAD_main(void) {
 		
 		if (need_to_check_IMU_interrupt) {
 			uint8_t int_src = read_from_IMU(0x24);
-			if (int_src) { // If the wakeup source was double tap, show time.
+			if (int_src & DOUBLE_TAP_ALL_MASK) { // If the wakeup source was double tap, show time.
 				continue_showing_time();
 			}
 			need_to_check_IMU_interrupt = false;			

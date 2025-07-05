@@ -28,7 +28,7 @@
 #define MOTOR_NODE DT_ALIAS(motorenable)
 static const struct gpio_dt_spec motor = GPIO_DT_SPEC_GET(MOTOR_NODE, gpios);
 
-static struct k_timer display_timeout;
+// static struct k_timer display_timeout;
 static struct k_timer motor_timeout;
 
 #define MAIN_STACKSIZE 512*32

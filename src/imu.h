@@ -19,8 +19,18 @@ static const struct i2c_dt_spec imu_i2c = I2C_DT_SPEC_GET(I2C0_IMU_NODE);
 #endif
 
 #ifdef __LIS2DUX12
+
+#define FF_IA_ALL_MASK              0b0000001
+#define WU_IA_ALL_MASK              0b0000010
+#define SINGLE_TAP_ALL_MASK         0b0000100
+#define DOUBLE_TAP_ALL_MASK         0b0001000
+#define TRIPLE_TAP_ALL_MASK         0b0010000
+#define D6D_IA_ALL_MASK             0b0100000
+#define SLEEP_CHANGE_IA_ALL_MASK    0b1000000
+
 #define I2C0_IMU_NODE DT_NODELABEL(lis2dux12)
 static const struct i2c_dt_spec imu_i2c = I2C_DT_SPEC_GET(I2C0_IMU_NODE);
+
 #endif
 
 void IMU_init(void);
